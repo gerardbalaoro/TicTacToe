@@ -32,7 +32,7 @@ class Board:
 		"""
 		return len(self.__matrix)
 		
-	def row(n):
+	def row(self,n):
 		"""Get single row
 		
 		Arguments:
@@ -41,9 +41,9 @@ class Board:
 		Returns:
 			tuple
 		"""
-		return tuple(self.__matrix[y])
+		return tuple(self.__matrix[n])
 
-	def column(n):
+	def column(self,n):
 		"""Get single row
 		
 		Arguments:
@@ -84,20 +84,21 @@ class Board:
 			x {int} -- zero-based row number
 			y {int} -- zero-based column number
 		"""
-		if self.row(x).count(value) == self.get.Size():
+		if self.row(x).count(value) == self.size():
 			return True
 		
-		if self.column(y).count(value) == self.get.Size():
+		if self.column(y).count(value) == self.size():
 			return True
 
-		if 0 < x > self.size() and 0 < y > self.size():
-			for c in range(self.size()):
-				if self.get(c, c) != value:
-					return False
+		if (x in (0, self.size()-1) and y in (0, self.size()-1)) or (x in range(1, self.size()-1) and y in range(1, self.size()-1)):
+			if x == y:
+				for c in range(self.size()):
+					if self.get(c, c) != value:
+						return False
+			else:
+				for c in range(self.size()):
+					if self.get(c, self.size()-1-c):
+						return False
 			return True
 
 		return False
-			
-		
-				
-	
