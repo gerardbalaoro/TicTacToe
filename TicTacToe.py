@@ -310,3 +310,50 @@ class FlipMode:
         if len(lines) > 0:
             return lines
         return False
+
+	    def win(self, x, y):
+        """
+        Checks if there is a line that can no longer be flipped out of place.
+        Parameters:
+            x {int} -- zero-based row number
+            y {int} -- zero-based column number
+        Returns:
+            True if there is, False if otherwise
+        """
+        lines = self.check(x, y)
+        if lines is not False:
+            for line in lines:
+                orient, x, y = line[0], int(line[1]), int(line[2])
+                if orient == 'v':
+                    for c in range(3):
+                        if self.canflip(x+c, y) is not False:
+                            return False
+                elif orient == 'v4':
+                    for c in range(4):
+                        if self.canflip(x+c, y) is not False:
+                            return False
+                elif orient == 'h':
+                    for c in range(3):
+                        if self.canflip(x, y+c) is not False:
+                            return False
+                elif orient == 'h4':
+                    for c in range(4):
+                        if self.canflip(x, y+c) is not False:
+                            return False
+                elif orient == 'd+':
+                    for c in range(3):
+                        if self.canflip(x+c, y-c) is not False:
+                            return False
+                elif orient == 'd4+':
+                    for c in range(4):
+                        if self.canflip(x+c, y-c) is not False:
+                            return False
+                elif orient == 'd-':
+                    for c in range(3):
+                        if self.canflip(x+c, y+c) is not False:
+                            return False
+                elif orient == 'd4-':
+                    for c in range(4):
+                        if self.canflip(x+c, y+c) is not False:
+                            return False
+                return True
