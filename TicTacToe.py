@@ -108,14 +108,10 @@ class FlipMode:
     """FlipTacToe Board Class"""
 
     def __init__(self):
-        """Initialize board matrix
-
-        Arguments:
-            size {int} -- length of sides (default: {3})
-        """
+        """Initialize board matrix"""
         self.matrix = []
         for row in range(4):
-            self.matrix.append([' ' for _ in range(4)])
+            self.matrix.append([' ']*4)
 
     def string(self):
         """Prints the board in the terminal"""
