@@ -103,23 +103,19 @@ class Board:
 
 		return False
 
+
 class FlipMode:
-    """TicTacToe Flip Game Mode"""
+    """FlipTacToe Board Class"""
 
     def __init__(self):
-        """Initializes the 4x4 board"""
+        """Initialize board matrix
 
+        Arguments:
+            size {int} -- length of sides (default: {3})
+        """
         self.matrix = []
         for row in range(4):
             self.matrix.append([' ' for _ in range(4)])
-
-    def board(self):
-        """
-        Create a copy of the current state of the board matrix
-        Returns:
-             The board matrix in list form
-        """
-        return self.matrix.copy()
 
     def string(self):
         """Prints the board in the terminal"""
@@ -180,13 +176,13 @@ class FlipMode:
             self.matrix[x][y] = self.matrix[x][y].lower()
 
         if d == 'up':
-            self.matrix[x][y], self.matrix[x-1][y] = ' ', self.matrix[x][y]
+            self.matrix[x][y], self.matrix[x - 1][y] = ' ', self.matrix[x][y]
         elif d == 'down':
-            self.matrix[x][y], self.matrix[x+1][y] = ' ', self.matrix[x][y]
+            self.matrix[x][y], self.matrix[x + 1][y] = ' ', self.matrix[x][y]
         elif d == 'left':
-            self.matrix[x][y], self.matrix[x][y-1] = ' ', self.matrix[x][y]
-        else:
-            self.matrix[x][y], self.matrix[x][y+1] = ' ', self.matrix[x][y]
+            self.matrix[x][y], self.matrix[x][y - 1] = ' ', self.matrix[x][y]
+        elif d == 'right':
+            self.matrix[x][y], self.matrix[x][y + 1] = ' ', self.matrix[x][y]
 
     def canflip(self, x, y):
         """
@@ -197,23 +193,35 @@ class FlipMode:
         Returns:
             A tuple of the directions it can flip to or False
         """
-        can = []
+        can_go = []
 
         if x > 0:
-            if self.matrix[x-1][y] == ' ':
-                can.append('up')
+            if self.matrix[x - 1][y] == ' ':
+                self.flip(x, y, 'up')
+                if self.check(x - 1, y) is False:
+                    can_go.append('up')
+                self.flip(x - 1, y, 'down')
         if x < 3:
-            if self.matrix[x+1][y] == ' ':
-                can.append('down')
+            if self.matrix[x + 1][y] == ' ':
+                self.flip(x, y, 'down')
+                if self.check(x + 1, y) is False:
+                    can_go.append('down')
+                self.flip(x + 1, y, 'up')
         if y > 0:
-            if self.matrix[x][y-1] == ' ':
-                can.append('left')
+            if self.matrix[x][y - 1] == ' ':
+                self.flip(x, y, 'left')
+                if self.check(x, y - 1) is False:
+                    can_go.append('left')
+                self.flip(x, y - 1, 'right')
         if y < 3:
-            if self.matrix[x][y+1] == ' ':
-                can.append('right')
+            if self.matrix[x][y + 1] == ' ':
+                self.flip(x, y, 'right')
+                if self.check(x, y + 1) is False:
+                    can_go.append('right')
+                self.flip(x, y + 1, 'left')
 
-        if len(can) > 0:
-            return tuple(can)
+        if len(can_go) > 0:
+            return tuple(can_go)
         else:
             return False
 
@@ -224,8 +232,81 @@ class FlipMode:
             x {int} -- zero-based row number
             y {int} -- zero-based column number
         Returns:
-            A tuple of the line/s made or False
+            A tuple of the line/s made, with the coordinates of the start of the line, or False
+            (The lines can either be 'v', 'h', 'd+', or 'd-', which represents the orientations
+            vertical, horizontal, diagonal with positive slope, and diagonal with negative slope,
+            respectively. Just in case the line is 4 cells long, the orientation will have an
+            addition '4' added to its string)
         """
         value = self.matrix[x][y]
 
-        """INCOMPLETE"""
+        if value == ' ':
+            return False
+
+        lines = []
+
+        if self.column(y).count(value) == 3:
+            lines.append(('v', self.column(y).index(value), y))
+        elif self.column(y).count(value) == 4:
+            lines.append(('v4', 0, y))
+
+        if self.row(x).count(value) == 3:
+            lines.append(('h', x, self.row(x).index(value)))
+        elif self.row(x).count(value) == 4:
+            lines.append(('h4', x, 0))
+
+        d4 = True
+        for c in range(4):
+            if self.matrix[3 - c][c] != value:
+                d4 = False
+                break
+        if d4:
+            lines.append(('d4+', 0, 3))
+        elif x > 1 and y < 2:
+            for c in range(3):
+                if self.matrix[x - c][y + c] != value:
+                    break
+                if c == 2:
+                    lines.append(('d+', x - 2, y + 2))
+        elif 0 < x < 3 and 0 < y < 3:
+            for c in range(3):
+                if self.matrix[x + 1 - c][y - 1 + c] != value:
+                    break
+                if c == 2:
+                    lines.append(('d+', x - 1, y + 1))
+        elif x < 2 and y > 1:
+            for c in range(3):
+                if self.matrix[x + c][y - c] != value:
+                    break
+                if c == 2:
+                    lines.append(('d+', x, y))
+
+        d4 = True
+        for c in range(4):
+            if self.matrix[c][c] != value:
+                d4 = False
+                break
+        if d4:
+            lines.append(('d4-', 0, 0))
+        elif x < 2 and y < 2:
+            for c in range(3):
+                if self.matrix[x + c][y + c] != value:
+                    break
+                if c == 2:
+                    lines.append(('d-', x, y))
+        elif 0 < x < 3 and 0 < y < 3:
+            for c in range(3):
+                if self.matrix[x - 1 + c][y - 1 + c] != value:
+                    break
+                if c == 2:
+                    lines.append(('d-', x - 1, y - 1))
+        elif x > 1 and y > 1:
+            for c in range(3):
+                if self.matrix[x - c][y - c] != value:
+                    break
+                if c == 2:
+                    lines.append(('d-', x - 2, y - 2))
+
+        if len(lines) > 0:
+            return lines
+        return False
