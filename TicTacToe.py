@@ -1,107 +1,173 @@
-class Board:
-	"""TicTacToe Board Class"""
+class UltimateMode:
+    """Ultimate Board Class"""
 
-	def __init__(self, size=3):
-		"""Initialize board matrix
-		
-		Arguments:
-			size {int} -- length of sides (default: {3})
-		"""
-		self.__matrix = []
-		for row in range(size):
-			self.__matrix.append([None for col in range(size)])
+    def __init__(self):
+        """Initialize board matrix"""
 
-	def board(self):
-		"""Create a copy of the current state of the board matrix
+        """The actual list of board in each cell"""
+        self.matrix = []
+        for row in range(3):
+            self.matrix.append([])
+            for col in range(3):
+                inner_board = []
+                for inner_row in range(3):
+                    inner_board.append([' ']*3)
+                self.matrix[row].append(inner_board)
 
-		Returns:
-			list
-		"""
-		return self.__matrix.copy()
+        """
+        A summarized version of the main board that will
+        only show which of the smaller board are done
+        """
+        self.big = []
+        for row in range(3):
+            self.big.append([' ']*3)
 
-	def toString(self):
-		return '\n'.join([
-			'|\t' + '\t|\t'.join(['-' if col == None else col for col in row]) + '\t|' for row in self.__matrix
-		])
-	
-	def size(self):
-		"""Get board size
-		
-		Returns:
-			int
-		"""
-		return len(self.__matrix)
-		
-	def row(self,n):
-		"""Get single row
-		
-		Arguments:
-			n {int} -- zero-based row number
-		
-		Returns:
-			tuple
-		"""
-		return tuple(self.__matrix[n])
+    def string(self):
+        """Prints the board in the terminal"""
+        out = '-' * 55 + '\n'
+        for x in range(3):
+            for inner_x in range(3):
+                for y in range(3):
+                    out += '|   '
+                    for inner_y in range(3):
+                        if self.big[x][y] != ' ':
+                            if inner_y == 0:
+                                if inner_x == 1:
+                                    out += ' '*5 + self.big[x][y] + ' '*5
+                                else:
+                                    out += ' '*11
+                        else:
+                            out += ' {} '.format(self.matrix[x][y][inner_x][inner_y])
+                            if inner_y != 2:
+                                out += '|'
+                    out += '   '
+                out += '|\n'
+                for y in range(3):
+                    if inner_x != 2:
+                        if self.big[x][y] != ' ':
+                            out += ('|' + ' '*17)
+                        else:
+                            out += ('|   ' + '-' * 11 + '   ')
+                        if y == 2:
+                            out += '|\n'
+            out += '-' * 55 + '\n'
+        print(out)
 
-	def column(self,n):
-		"""Get single row
-		
-		Arguments:
-			n {int} -- zero-based column number
-		
-		Returns:
-			tuple
-		"""
-		return tuple([row[n] for row in self.__matrix])
-			
-	def get(self, x, y):
-		"""Get cell value based on (x, y) coordinates
-		
-		Arguments:
-			x {int} -- zero-based row number
-			y {int} -- zero-based column number
-		
-		Returns:
-			mixed
-		"""
-		return self.__matrix[x][y]
+    def row(self, n, x=3, y=3):
+        """
+        Gets a single row from one of the inner boards or from the main summarized board
+        Arguments:
+            n {int} -- zero-based row number for the inner board
+            x {int} -- zero-based row number for the main board
+            y {int} -- zero-based column number for the main board
+        Returns:
+            tuple of the row
+        """
+        if x == 3 or y == 3:
+            return tuple(self.big[n])
+        else:
+            return tuple(self.matrix[x][y][n])
 
-	def set(self, value, x, y):
-		"""Set cell value of based on (x, y) coordinates
-		
-		Arguments:
-			x {int} -- zero-based row number
-			y {int} -- zero-based column number
-		"""
-		if self.get(x, y) == None:
-			self.__matrix[x][y] = value
-		
-	def check(self, value, x=None, y=None):
-		"""Check if the value existed N times vertically,
-		horizontally, or diagonally. N is the size of the matrix
-		
-		Arguments:
-			x {int} -- zero-based row number
-			y {int} -- zero-based column number
-		"""
-		if self.row(x).count(value) == self.size():
-			return True
-		
-		if self.column(y).count(value) == self.size():
-			return True
+    def column(self, n, x=3, y=3):
+        """
+        Gets a single column from one of the inner boards or from the main summarized board
+        Arguments:
+            n {int} -- zero-based column number for the inner board
+            x {int} -- zero-based row number for the main board
+            y {int} -- zero-based column number for the main board
+        Returns:
+            tuple of the column
+        """
+        if x == 3 or y == 3:
+            return tuple([row[n] for row in self.big])
+        else:
+            return tuple([row[n] for row in self.matrix[x][y]])
 
-		if (x in (0, self.size()-1) and y in (0, self.size()-1)) or (x in range(1, self.size()-1) and y in range(1, self.size()-1)):
-			if x == y:
-				for c in range(self.size()):
-					if self.get(c, c) != value:
-						return False
-			else:
-				for c in range(self.size()):
-					if self.get(c, self.size()-1-c):
-						return False
-			return True
+    def set(self, value, x, y, ix=3, iy=3):
+        """
+        Sets the cell value based on (x, y, ix, iy) coordinates or just on (x, y) coordinates
+        Arguments:
+            x {int} -- zero-based row number for the main board
+            y {int} -- zero-based column number for the main board
+            ix {int} -- zero-based row number for the inner board
+            iy {int} -- zero-based column number for the inner board
+        """
+        if ix == 3 or iy == 3:
+            if self.big[x][y] == ' ':
+                self.big[x][y] = value
+        else:
+            if self.matrix[x][y][ix][iy] == ' ':
+                self.matrix[x][y][ix][iy] = value
 
-		return False
+    def check(self, x, y, ix=3, iy=3):
+        """
+        Checks if the value existed 3 times vertically, horizontally, or diagonally.
+        Arguments:
+            x {int} -- zero-based row number for the main board
+            y {int} -- zero-based column number for the main board
+            ix {int} -- zero-based row number for the inner board
+            iy {int} -- zero-based column number for the inner board
+        Returns:
+            A tuple containing who won and the line/s made, with the coordinates of the start of the line,
+            '-' if there's a draw, or False otherwise. (The lines can either be 'v', 'h', 'd+', or 'd-', which represents
+            the orientations vertical, horizontal, diagonal with positive slope, and diagonal with
+            negative slope, respectively.)
+        """
+        lines = []
+
+        if ix == 3 or iy == 3:
+            value = self.big[x][y]
+
+            if value != '-':
+                if self.row(x).count(value) == 3:
+                    lines.append(('h', x, 0))
+
+                if self.column(y).count(value) == 3:
+                    lines.append(('v', 0, y))
+
+                if self.big[0][2] == value and self.big[1][1] == value and self.big[2][0] == value:
+                    lines.append(('d+', 0, 2))
+                if self.big[0][0] == value and self.big[1][1] == value and self.big[2][2] == value:
+                    lines.append(('d-', 0, 0))
+
+            if len(lines) > 0:
+                return value, tuple(lines)
+            else:
+                space = 0
+                for r in range(3):
+                    space += self.big[r].count(' ')
+                if space == 0:
+                    return '-'
+        else:
+            value = self.matrix[x][y][ix][iy]
+
+            if self.row(ix, x, y).count(value) == 3:
+                lines.append(('h', x, y, ix, 0))
+
+            if self.column(iy, x, y).count(value) == 3:
+                lines.append(('v', x, y, 0, iy))
+
+            if (self.matrix[x][y][0][2] == value and
+                    self.matrix[x][y][1][1] == value and
+                    self.matrix[x][y][2][0] == value):
+                lines.append(('d+', x, y, 0, 2))
+            if (self.matrix[x][y][0][0] == value and
+                    self.matrix[x][y][1][1] == value and
+                    self.matrix[x][y][2][2] == value):
+                lines.append(('d-', x, y, 0, 0))
+
+            if len(lines) > 0:
+                self.set(value, x, y)
+                return value, tuple(lines)
+            else:
+                space = 0
+                for r in range(3):
+                    space += self.matrix[x][y][r].count(' ')
+                if space == 0:
+                    self.set('-', x, y)
+                    return '-'
+
+        return False
 
 
 class FlipMode:
