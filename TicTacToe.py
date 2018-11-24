@@ -373,7 +373,7 @@ class FlipMode:
             return lines
         return False
 
-	    def win(self, x, y):
+    def win(self, x, y):
         """
         Checks if there is a line that can no longer be flipped out of place.
         Parameters:
