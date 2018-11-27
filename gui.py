@@ -1,36 +1,19 @@
 import pyglet
 from pyglet.gl import *
 
-
 class Window(pyglet.window.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # self.set_minimum_size(400, 300)
-        # self.set_maximum_size(1600, 1200)
-
-        self.background = pyglet.image.load('resources/Main_Menu_final.jpg')
+        self.background = pyglet.image.load('resources/Main_Menu.jpg')
         self.currentscreen = 'Main Menu'
         self.main()
-
-    """
-    #if window is resizable
-    def on_resize(self, width, height):
-        self.set_size(width, int(width*3/4))
-
-        viewport = self.get_viewport_size()
-        gl.glViewport(0, 0, max(1, viewport[0]), max(1, viewport[1]))
-        gl.glMatrixMode(gl.GL_PROJECTION)
-        gl.glLoadIdentity()
-        gl.glOrtho(0, max(1, width), 0, max(1, height), -1, 1)
-        gl.glMatrixMode(gl.GL_MODELVIEW)
-    """
 
     def on_draw(self):
         self.clear()
 
         bg = pyglet.sprite.Sprite(self.background, x=0, y=0)
-        bg.scale = self.width / 1600
+        bg.scale = 0.5
         bg.draw()
 
     def on_mouse_press(self, x, y, button, modifiers):
@@ -47,36 +30,50 @@ class Window(pyglet.window.Window):
 
         elif self.currentscreen[0] == 'Rules':
             if (((x-380)**2)/10) + (((y-90)**2)/5) <= 25**2:
-                print('PLAY')
+                self.board(self.currentscreen[1])
             elif ((x in range(560, 760) and y in range(480, 500)) or
                   (x in range(610, 720) and y in range(500, 545))):
                 self.main()
+
         elif self.currentscreen[0] == 'Board':
-            pass
+            """Board Clicking"""
+            if ((x in range(45, 243) and y in range(48, 62)) or
+                    (x in range(80, 180) and y in range(62, 110))):
+                self.save(self.currentscreen)
+                
 
     def main(self):
-        self.background = pyglet.image.load('resources/Main_Menu_final.jpg')
+        self.background = pyglet.image.load('resources/Main_Menu.jpg')
         self.currentscreen = 'Main Menu'
 
+    def save(self, game):
+        """Saving stuff"""
+        self.main()
+
     def load(self):
+        """Loading stuff"""
         pass
 
     def rules(self, mode):
         self.currentscreen = ('Rules', mode)
+
         if mode == '3x3':
-            self.background = pyglet.image.load('resources/Rules_of_3x3_final.jpg')
+            self.background = pyglet.image.load('resources/Rules_3x3.jpg')
         elif mode == 'Flip':
-            self.background = pyglet.image.load('resources/Rules_of_Flip_final.jpg')
+            self.background = pyglet.image.load('resources/Rules_Flip.jpg')
         elif mode == 'Ulti':
-            self.background = pyglet.image.load('resources/rules_of_ultimate.jpg')
+            self.background = pyglet.image.load('resources/rules_Ultimate.jpg')
 
     def board(self, mode):
+        self.currentscreen = ('Board', mode)
+
         if mode == '3x3':
-            self.background = pyglet.image.load('resources/3X3_game_final.jpg')
+            self.background = pyglet.image.load('resources/3X3_Game.jpg')
         elif mode == 'Flip':
-            self.background = pyglet.image.load('resources/Flip_tac_toe_game.jpg')
+            self.background = pyglet.image.load('resources/Flip_Game.jpg')
         elif mode == 'Ulti':
-            self.background = pyglet.image.load('resources/ultimate_game.jpg')
+            self.background = pyglet.image.load('resources/Ultimate_Game.jpg')
 
 def app():
     pyglet.app.run()
+
