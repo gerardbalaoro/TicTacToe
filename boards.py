@@ -56,10 +56,12 @@ class UltimateMode:
     def row(self, n, x=3, y=3):
         """
         Gets a single row from one of the inner boards or from the main summarized board
+        
         Arguments:
             n {int} -- zero-based row number for the inner board
             x {int} -- zero-based row number for the main board
             y {int} -- zero-based column number for the main board
+        
         Returns:
             tuple of the row
         """
@@ -71,10 +73,12 @@ class UltimateMode:
     def column(self, n, x=3, y=3):
         """
         Gets a single column from one of the inner boards or from the main summarized board
+        
         Arguments:
             n {int} -- zero-based column number for the inner board
             x {int} -- zero-based row number for the main board
             y {int} -- zero-based column number for the main board
+        
         Returns:
             tuple of the column
         """
@@ -86,6 +90,7 @@ class UltimateMode:
     def set(self, value, x, y, ix=3, iy=3):
         """
         Sets the cell value based on (x, y, ix, iy) coordinates or just on (x, y) coordinates
+        
         Arguments:
             x {int} -- zero-based row number for the main board
             y {int} -- zero-based column number for the main board
@@ -102,11 +107,13 @@ class UltimateMode:
     def check(self, x, y, ix=3, iy=3):
         """
         Checks if the value existed 3 times vertically, horizontally, or diagonally.
+        
         Arguments:
             x {int} -- zero-based row number for the main board
             y {int} -- zero-based column number for the main board
             ix {int} -- zero-based row number for the inner board
             iy {int} -- zero-based column number for the inner board
+        
         Returns:
             A tuple containing who won and the line/s made, with the coordinates of the start of the line,
             '-' if there's a draw, or False otherwise. (The lines can either be 'v', 'h', 'd+', or 'd-',
@@ -196,8 +203,10 @@ class FlipMode:
     def column(self, n):
         """
         Gets a single column from the board
+        
         Parameters:
             n {int} -- a zero based row number
+        
         Returns:
             the column in tuple form
         """
@@ -206,9 +215,11 @@ class FlipMode:
     def get(self, x, y):
         """
         Get cell value based on (x, y) coordinates
+        
         Parameters:
             x {int} -- zero-based row number
             y {int} -- zero-based column number
+        
         Returns:
             the cell value
         """
@@ -217,6 +228,7 @@ class FlipMode:
     def set(self, value, x, y):
         """
         Sets cell value of based on (x, y) coordinates
+        
         Parameters:
             value {str} -- either 'X', 'x', 'O', or 'o'
             x {int} -- zero-based row number
@@ -227,6 +239,7 @@ class FlipMode:
     def flip(self, x, y, d):
         """
         Flips the opponent's piece in one of the 4 cardinal directions
+        
         Parameters:
             x {int} -- zero-based row number
             y {int} -- zero-based column number
@@ -249,9 +262,11 @@ class FlipMode:
     def canflip(self, x, y):
         """
         Checks if the cell value can still be flipped
+        
         Parameters:
             x {int} -- zero-based row number
             y {int} -- zero-based column number
+        
         Returns:
             A tuple of the directions it can flip to or False
         """
@@ -290,9 +305,11 @@ class FlipMode:
     def check(self, x, y):
         """
         Checks if there is a line of 3 of the same value vertically, horizontally, or diagonally
+        
         Parameters:
             x {int} -- zero-based row number
             y {int} -- zero-based column number
+        
         Returns:
             A tuple of the line/s made, with the coordinates of the start of the line, or False
             (The lines can either be 'v', 'h', 'd+', or 'd-', which represents the orientations
@@ -376,9 +393,11 @@ class FlipMode:
     def win(self, x, y):
         """
         Checks if there is a line that can no longer be flipped out of place.
+        
         Parameters:
             x {int} -- zero-based row number
             y {int} -- zero-based column number
+        
         Returns:
             True if there is, False if otherwise
         """
