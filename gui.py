@@ -5,7 +5,7 @@ class Window(pyglet.window.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.background = pyglet.image.load('resources/Main_Menu.jpg')
+        self.background = pyglet.image.load('resources/main_menu.jpg')
         self.currentscreen = 'Main Menu'
         self.main()
 
@@ -43,7 +43,7 @@ class Window(pyglet.window.Window):
                 
 
     def main(self):
-        self.background = pyglet.image.load('resources/Main_Menu.jpg')
+        self.background = pyglet.image.load('resources/main_menu.jpg')
         self.currentscreen = 'Main Menu'
 
     def save(self, game):
@@ -58,21 +58,21 @@ class Window(pyglet.window.Window):
         self.currentscreen = ('Rules', mode)
 
         if mode == '3x3':
-            self.background = pyglet.image.load('resources/Rules_3x3.jpg')
+            self.background = pyglet.image.load('resources/rules_3x3.jpg')
         elif mode == 'Flip':
-            self.background = pyglet.image.load('resources/Rules_Flip.jpg')
+            self.background = pyglet.image.load('resources/rules_flip.jpg')
         elif mode == 'Ulti':
-            self.background = pyglet.image.load('resources/rules_Ultimate.jpg')
+            self.background = pyglet.image.load('resources/rules_ultimate.jpg')
 
     def board(self, mode):
         self.currentscreen = ('Board', mode)
 
         if mode == '3x3':
-            self.background = pyglet.image.load('resources/3X3_Game.jpg')
+            self.background = pyglet.image.load('resources/3x3_game.jpg')
         elif mode == 'Flip':
-            self.background = pyglet.image.load('resources/Flip_Game.jpg')
+            self.background = pyglet.image.load('resources/flip_game.jpg')
         elif mode == 'Ulti':
-            self.background = pyglet.image.load('resources/Ultimate_Game.jpg')
+            self.background = pyglet.image.load('resources/ultimate_game.jpg')
 
 def app():
     pyglet.app.run()
