@@ -1,1 +1,2 @@
-pyglet
+future==0.17.1
+pyglet==1.3.2
