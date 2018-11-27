@@ -1,5 +1,6 @@
-import interface, enginee
+import interface
+import engine
 
-window = gui.Window(width=800, height=600, caption='Tic Tac Toe Unlimited', resizable=False)
+window = interface.Window(width=800, height=600, caption='Tic Tac Toe Unlimited', resizable=False)
 
-gui.app()
+interface.app()

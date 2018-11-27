@@ -1,4 +1,4 @@
-from boards import *
+from engine import *
 
 while True:
     mode = input().lower()
@@ -10,9 +10,10 @@ if mode == 'flip':
     B = FlipMode()
 
     ctr = 0
-    f = True
+    f = False
 
-    while True:
+    won = False
+    while not won:
         B.string()
 
         ctr = 0
@@ -27,7 +28,7 @@ if mode == 'flip':
 
             x, y = int(inp[0]), int(inp[1])
 
-            if ctr  == 0:
+            if ctr == 0:
                 val = 'x'
             else:
                 val = 'o'
@@ -36,12 +37,15 @@ if mode == 'flip':
                 if inp[2] in B.canflip(x, y):
                     B.flip(x, y, inp[2])
                     f = False
+
                     break
-                continue
 
             else:
                 if inp[2] == '1':
                     val = val.upper()
+
+                if B.get(x, y) != ' ':
+                    continue
 
             if act != 'c':
                 ex = inp[3]
