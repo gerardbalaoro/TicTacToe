@@ -1,7 +1,7 @@
 from engine import *
 
 while True:
-    mode = input().lower()
+    mode = input('Choose:   Flip   or   Ultimate\n').lower()
     if mode in ('flip', 'ultimate'):
         break
 
@@ -10,61 +10,67 @@ if mode == 'flip':
     B = FlipMode()
 
     ctr = 0
-    f = False
+    flipping = False
 
-    won = False
-    while not won:
+    while True:
+        if ctr % 2 == 0:
+            val = 'x'
+        else:
+            val = 'o'
+        print('\n' + val.upper() + "'s TURN", end='')
+        if flipping:
+            print('  (flip)')
+        else:
+            print('  (place)')
         B.string()
 
-        ctr = 0
+        #try:
+        inp = input()
 
-        try:
-            inp = input()
+        if inp == 'exit':
+            break
 
-            if inp == 'exit':
+        inp = inp.split()
+
+        x, y = int(inp[0]), int(inp[1])
+
+        if flipping:
+            if inp[2] not in B.can_flip(x, y):
+                continue
+            
+            f = B.flip(x, y, inp[2])
+            print(f)
+            if f is not False:
+                flipping = False
+
+                if f is not True:
+                    print('\n\n' + f.upper() + ' WINS!!!')
+                    B.string()
+                    break
+        else:
+            if inp[2] == '1':
+                val = val.upper()
+            elif inp[2] != '0':
+                continue
+
+            if B.get(x, y) != ' ':
+                continue
+
+            s = B.set(val, x, y)
+            
+            if s is not None:
+                if s == '-':
+                    print('\n\n--DRAW--')
+                else:
+                    print('\n\n' + s.upper() + ' WINS!!!')
+                B.string()
                 break
 
-            inp = inp.split()
-
-            x, y = int(inp[0]), int(inp[1])
-
-            if ctr == 0:
-                val = 'x'
-            else:
-                val = 'o'
-
-            if f:
-                if inp[2] in B.canflip(x, y):
-                    B.flip(x, y, inp[2])
-                    f = False
-
-                    break
-
-            else:
-                if inp[2] == '1':
-                    val = val.upper()
-
-                if B.get(x, y) != ' ':
-                    continue
-
-            if act != 'c':
-                ex = inp[3]
-
-            if act == 's':
-                B.set(ex, x, y)
-                if B.win(x, y):
-                    B.string()
-                    print('\n' + ex.upper() + ' Wins!!!')
-                    break
-            elif act == 'f':
-                if ex in B.canflip(x, y):
-                    B.flip(x, y, ex)
-            elif act == 'c':
-                print(B.check(x, y))
-            print()
-        except:
-            print('\nINVALID')
-            continue
+            ctr += 1
+            flipping = True
+        #except:
+         #   print('\nINVALID')
+          #  continue
 
 else:
 
