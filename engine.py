@@ -241,8 +241,16 @@ class FlipMode:
             value {str} -- either 'X', 'x', 'O', or 'o'
             x {int} -- zero-based row number
             y {int} -- zero-based column number
+
+        Returns:
+            game_over {str} --  the value of the piece if an unflippable line of 3 is formed
+                or '-' if there is a draw
         """
         self.matrix[x][y] = value
+
+        game_over = self.won(x, y)
+        if game_over is not False:
+            return game_over
 
     def flip(self, x, y, d):
         """
@@ -253,25 +261,44 @@ class FlipMode:
             x {int} -- zero-based row number
             y {int} -- zero-based column number
             d {str} -- either 'up', 'down', 'left', or 'right'
+
+        Returns:
+            True if the piece can be flipped,
+            False if the piece can't be flipped, or
+            value {str} -- the value of the piece if it gets flipped into a line of 3
         """
+
+        if d not in self.can_flip(x, y):
+            return False
+        
         value = self.get(x, y)
         if value == value.lower():
-            self.set(value.upper(), x, y)
+            value = value.upper()
         else:
-            self.set(value.lower(), x, y)
+            value = value.lower()
 
+        r, c = x, y
         if d == 'u':
             self.set(' ', x, y)
-            self.set(value, x - 1, y)
+            r -= 1
+            self.set(value, r, c)
         elif d == 'd':
             self.set(' ', x, y)
-            self.set(value, x + 1, y)
+            r += 1
+            self.set(value, r, c)
         elif d == 'l':
             self.set(' ', x, y)
-            self.set(value, x, y - 1)
+            c -= 1
+            self.set(value, r, c)
         elif d == 'r':
             self.set(' ', x, y)
+            c += 1
             self.set(value, x, y + 1)
+
+        if len(self.check(r, c)) > 0:
+            return value
+        
+        return True
 
     def can_flip(self, x, y):
         """
@@ -286,21 +313,22 @@ class FlipMode:
         """
         can_go = []
 
-        if x > 0:
-            if self.matrix[x - 1][y] == ' ':
-                can_go.append('u')
+        if self.get(x, y) != ' ':
+            if x > 0:
+                if self.get(x - 1, y) == ' ':
+                    can_go.append('u')
 
-        if x < 3:
-            if self.matrix[x + 1][y] == ' ':
-                can_go.append('d')
+            if x < 3:
+                if self.get(x + 1, y) == ' ':
+                    can_go.append('d')
 
-        if y > 0:
-            if self.matrix[x][y - 1] == ' ':
-                can_go.append('l')
+            if y > 0:
+                if self.get(x, y - 1) == ' ':
+                    can_go.append('l')
 
-        if y < 3:
-            if self.matrix[x][y + 1] == ' ':
-                can_go.append('r')
+            if y < 3:
+                if self.get(x, y + 1) == ' ':
+                    can_go.append('r')
 
         return can_go
 
@@ -389,16 +417,18 @@ class FlipMode:
 
         return lines
 
-    def win(self, x, y):
+    def won(self, x, y):
         """
         Checks if there is a line that can no longer be flipped out of place.
+        (a player has won)
         
         Parameters:
             x {int} -- zero-based row number
             y {int} -- zero-based column number
         
         Returns:
-            value {str} -- the player that won or '-' if there is a draw
+            value {str} -- the value that won or '-' if there is a draw, or
+            False if otherwise
         """
 
         if ' ' not in ''.join([''.join(self.row(r)) for r in range(4)]):
@@ -407,13 +437,10 @@ class FlipMode:
         value = self.get(x, y)
         lines = self.check(x, y)
 
-        forlooping = {
-            'v':()
-        }
-
         if len(lines) > 0:
             for line in lines:
                 d, x, y = line[0], int(line[1]), int(line[2])
+                
                 if d == 'v':
                     for i in range(3):
                         if len(self.can_flip(x + i, y)) > 0:
@@ -422,6 +449,7 @@ class FlipMode:
                     for i in range(4):
                         if len(self.can_flip(x + i, y)) > 0:
                             return False
+                        
                 elif d == 'h':
                     for i in range(3):
                         if len(self.can_flip(x, y + i)) > 0:
@@ -430,20 +458,23 @@ class FlipMode:
                     for i in range(4):
                         if len(self.can_flip(x, y + i)) > 0:
                             return False
+                        
                 elif d == 'd+':
                     for i in range(3):
-                        if self.canflip(x+c, y-c) is not False:
+                        if len(self.can_flip(x + i, y - i)) > 0:
                             return False
                 elif d == 'd4+':
-                    for c in range(4):
-                        if self.canflip(x+c, y-c) is not False:
+                    for i in range(4):
+                        if len(self.can_flip(x + i, y - i)) > 0:
                             return False
+            
                 elif d == 'd-':
-                    for c in range(3):
-                        if self.canflip(x+c, y+c) is not False:
+                    for i in range(3):
+                        if len(self.can_flip(x + i, y + i)) > 0:
                             return False
                 elif d == 'd4-':
-                    for c in range(4):
-                        if self.canflip(x+c, y+c) is not False:
+                    for i in range(4):
+                        if len(self.can_flip(x + i, y + i)) > 0:
                             return False
-                return True
+                    
+                return value
