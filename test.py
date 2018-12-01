@@ -1,130 +1,206 @@
+import terminaltables as tb, os
+from argparse import ArgumentParser
 from engine import *
 
-while True:
-    mode = input('Choose:   Flip   or   Ultimate\n').lower()
-    if mode in ('flip', 'ultimate'):
-        break
+def clear():
+    """Clear console"""
+    _cls = os.system('cls' if os.name == 'nt' else 'clear')
 
-if mode == 'flip':
+def banner():
+    """Print Game Banner"""
+    print(tb.DoubleTable(['TICTACTOE']).table)
 
-    B = FlipMode()
+def start():
+    """Show Game Start Menu"""
+    selected = None
+    modes = {'1': 'Play Flip Mode', '2': 'Play Ultimate Mode', 'Q': 'Quit Game'}
+    while selected not in modes.keys():
+        clear()
+        banner()
+        menu = tb.DoubleTable(modes.items())
+        menu.inner_heading_row_border = False
+        print(menu.table)
+        selected = input('Select Option: ')
+    return selected
 
-    ctr = 0
-    flipping = False
+def status(mode, player):
+    """Show Game Status"""
+    print(tb.DoubleTable([[f'Playing {mode}', f'Player {player}\'s Turn']]).table)
+
+def end(winner = None):
+    """Show Game Over Screen"""
+    print(tb.DoubleTable([[f'GAME OVER', f'Player {winner} Wins' if winner != None else 'No Winners']]).table)
+    input("Press Any Key To Continue")
+
+def flip():
+    """Play Flip Mode"""
+    board = FlipMode()
+    # Current Player
+    player = 1
+    # Winner
+    winner = None    
+    # Prompt the Player to Flip
+    flip = False
 
     while True:
-        if ctr % 2 == 0:
-            val = 'x'
-        else:
-            val = 'o'
-        print('\n' + val.upper() + "'s TURN", end='')
-        if flipping:
-            print('  (flip)')
-        else:
-            print('  (place)')
-        B.string()
+        # Set up the screen
+        clear()
+        banner()
+        status('Flip Mode', player)
+        print('')
+        
+        # Print board
+        _board = tb.DoubleTable(board.matrix)
+        _board.inner_heading_row_border = False
+        _board.inner_row_border = True
+        print(_board.table)
+        print('')
 
-        #try:
-        inp = input()
-
-        if inp == 'exit':
+        # Check if there are still movable pieces, otherwise end the game
+        if board.over():
             break
 
-        inp = inp.split()
+        # Prompt player for input
+        prompt = 'Flip: <row>, <column>, <direction (u,d,l,r)>' if flip else 'Move: <row>, <column>'
+        inpt = [args.strip() for args in input(f'{prompt} | <quit> : ').split(',')]
 
-        x, y = int(inp[0]), int(inp[1])
+        # If user typed 'quit', exit to main menu
+        if inpt[0] == 'quit':
+            break
 
-        if flipping:
-            if inp[2] not in B.can_flip(x, y):
-                continue
-            
-            f = B.flip(x, y, inp[2])
-            print(f)
-            if f is not False:
-                flipping = False
+        # Check if input should be parsed as flip or set
+        if flip:
+            if len(inpt) == 3:
+                flipped = board.flip(int(inpt[0]), int(inpt[1]), inpt[2])
 
-                if f is not True:
-                    print('\n\n' + f.upper() + ' WINS!!!')
-                    B.string()
-                    break
-        else:
-            if inp[2] == '1':
-                val = val.upper()
-            elif inp[2] != '0':
-                continue
-
-            if B.get(x, y) != ' ':
-                continue
-
-            s = B.set(val, x, y)
-            
-            if s is not None:
-                if s == '-':
-                    print('\n\n--DRAW--')
+                # Check if flip successful
+                if flipped:
+                    # Check for winners
+                    if board.check(flipped[0], flipped[1]):
+                        winner = 1 if player == 2 else 2
+                        break
+                    # Next move should be set
+                    flip = False
                 else:
-                    print('\n\n' + s.upper() + ' WINS!!!')
-                B.string()
-                break
+                    # Flip failed, try again
+                    continue
+            else:
+                # Incomplete input, try again
+                continue
+        else:
+            if len(inpt) == 2:
+                move = board.set('x' if player == 1 else 'o', int(inpt[0]), int(inpt[1]))
 
-            ctr += 1
-            flipping = True
-        #except:
-         #   print('\nINVALID')
-          #  continue
+                # Check if set is successful
+                if move:
+                    # Check for winners
+                    if board.check(int(inpt[0]), int(inpt[1])):
+                        winner = player
+                        break
+                    # Change current player
+                    player = 1 if player == 2 else 2
+                    # Next move should be flip
+                    flip = True
+                else:
+                    # Action failed, try again
+                    continue
+            else:
+                # Incomplete input, try again
+                continue
+    
+    # Show game over screen
+    end(winner)
 
-else:
-
+def ulimate():
+    """Play Ultimate Mode"""
     B = UltimateMode()
 
     locked = False
+    player = 1
     ctr = 0
 
-    while True:
-        if ctr % 2 == 0:
-            value = 'x'
-        else:
-            value = 'o'
+    while True:        
+        # Set up screen
+        clear()
+        banner()
+        status('Ultimate Mode', player)
+        print('')
 
-        print(value.upper() + "'s Turn")
+        # Print board
         B.string()
 
-        try:
-            inp = input()
-            if inp == 'exit':
-                break
+        # Prompt player for input
+        prompt = 'Select Board <x>, <y>' if not locked else 'Move <row>, <column>'
+        inp = [args.strip() for args in input(f'{prompt} | <quit> : ').split(',')]
+        
+        # If user typed 'quit', exit to main menu
+        if inp[0] == 'quit':
+            break
 
-            inp = inp.split()
-            if locked:
-                ix, iy = int(inp[0]), int(inp[1])
+        # If incomplete input, try again
+        if len(inp) != 2:
+            continue
+        
+        # If board is not locked, parse input as board coordinates
+        if not locked:
+            x, y = int(inp[0]), int(inp[1])
+            locked = True
+            continue
+        else:
+            # else, parse input as cell coordinates
+            ix, iy = int(inp[0]), int(inp[1])
+
+        if B.get(x, y, ix, iy) == ' ':
+            value = 'x' if player == 1 else 'o'
+            B.set(value, x, y, ix, iy)
+
+            check = B.check(x, y, ix, iy)
+            if check != False:
+                B.set(check[0], x, y)
+
+                check = B.check(x, y)
+                if check != False:
+                    print('\n')
+                    if check[0] == '-':
+                        end(None)
+                    elif check[0] == 'x':
+                        end('1')
+                    else:
+                        end('2')
+                    break
+
+            if B.big[ix][iy] == ' ':
+                locked = True
+                x, y = ix, iy
             else:
-                x, y, ix, iy = int(inp[0]), int(inp[1]), int(inp[2]), int(inp[3])
+                locked = False
 
-            if B.matrix[x][y][ix][iy] == ' ':
+            # Change player
+            player = 1 if player == 2 else 2
 
-                B.set(value, x, y, ix, iy)
+#: ---------------------------
+#: Main Game Runner
+#: ---------------------------
+if __name__ == '__main__':
+    # Activate Debugger (Local Environment Only)
+    p = ArgumentParser()
+    p.add_argument('--debug', '-p', type=bool, default=False)
+    args = p.parse_args()
+    if args.debug == True:
+        import ptvsd
+        print("Waiting for debugger attach")
+        ptvsd.enable_attach(address=('localhost', 5678), redirect_output=True)
+        ptvsd.wait_for_attach()
 
-                check = B.check(x, y, ix, iy)
-                if check is not False:
-                    B.set(check[0], x, y)
+    # Start Game
+    while True:
+        action = start()        
+        if action == 'Q':            
+            break
+        elif action == '1':
+            flip()
+        elif action == '2':
+            ulimate()
 
-                    check = B.check(x, y)
-                    if check is not False:
-                        print('\n')
-                        if check[0] == '-':
-                            print('DRAW')
-                        elif check[0] == 'x':
-                            print('X WINS!')
-                        else:
-                            print('O WINS!')
-                        B.string()
-                        break
 
-                if B.big[ix][iy] == ' ':
-                    locked = True
-                    x, y = ix, iy
-                else:
-                    locked = False
 
-                ctr += 1
-        except:
-            print('\nINVALID INPUT')

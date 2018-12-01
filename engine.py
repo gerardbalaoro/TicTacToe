@@ -54,8 +54,7 @@ class UltimateMode:
         print(out)
 
     def get(self, x, y, ix=3, iy=3):
-        """
-        Get cell value based on (x, y) coordinates
+        """Get cell value
 
         Arguments:
             x {int} -- zero-based row number
@@ -182,7 +181,6 @@ class UltimateMode:
 
         return False
 
-
 class FlipMode:
     """FlipTacToe Board Class"""
 
@@ -193,234 +191,190 @@ class FlipMode:
             self.matrix.append([' ']*4)
 
     def string(self):
-        """Prints the board in the terminal"""
-
+        """Print the board in the terminal"""
         print('\n{}\n'.format('-'*15).join(['|'.join([' {} '.format(self.get(x, y))
                                                       for y in range(4)])for x in range(4)]))
 
     def row(self, n):
-        """
-        Gets a single row from the board
+        """Get row values
+
         Parameters:
             n {int} -- a zero based row number
+
         Returns:
-            {tuple} -- contains the elements of row n
+            tuple
         """
         return tuple(self.matrix[n])
 
     def column(self, n):
-        """
-        Gets a single column from the board
+        """Get column values
         
         Parameters:
             n {int} -- a zero based row number
         
         Returns:
-            {tuple} -- contains the elements of column n
+            tuple
         """
         return tuple([row[n] for row in self.matrix])
 
-    def get(self, x, y):
-        """
-        Get cell value based on (x, y) coordinates
-        
-        Parameters:
-            x {int} -- zero-based row number
-            y {int} -- zero-based column number
-        
-        Returns:
-            {str} -- the cell value
-        """
-        return self.matrix[x][y]
+    def diagonals(self, r, c):
+        """Get diagonal values intersecting (r, c) coodinates
 
-    def set(self, value, x, y):
-        """
-        Sets cell value of based on (x, y) coordinates
-        
         Parameters:
-            value {str} -- either 'X', 'x', 'O', or 'o'
-            x {int} -- zero-based row number
-            y {int} -- zero-based column number
+            r {int} -- a zero based row number
+            c {int} -- a zero based column number
 
         Returns:
-            game_over {str} --  the value of the piece if an unflippable line of 3 is formed
-                or '-' if there is a draw
+            dict -- forward and backward diagonal values
         """
-        self.matrix[x][y] = value
+        forwards = []
+        backwards = []
 
-        game_over = self.won(x, y)
-        if game_over is not False:
-            return game_over
+        for x in range(len(self.matrix)):
+            y = (x - r) + c
+            if 0 <= y < len(self.matrix):
+                forwards.append(self.get(x, y))
 
-    def flip(self, x, y, d):
-        """
-        Flips the opponent's piece in one of the 4 cardinal directions
-        ('u', 'd', 'l', and 'r', for up, down, left, and right, respectively
+            y = (r + x) + c
+            if 0 <= y < len(self.matrix):
+                backwards.append(self.get(x, y))
+
+        return {'forward': tuple(forwards), 'backward': tuple(backwards)}        
+
+    def get(self, r, c):
+        """Get cell value
         
         Parameters:
-            x {int} -- zero-based row number
-            y {int} -- zero-based column number
-            d {str} -- either 'up', 'down', 'left', or 'right'
-
-        Returns:
-            True if the piece can be flipped,
-            False if the piece can't be flipped, or
-            value {str} -- the value of the piece if it gets flipped into a line of 3
-        """
-
-        if d not in self.can_flip(x, y):
-            return False
+            r {int} -- zero-based row number
+            c {int} -- zero-based column number
         
-        value = self.get(x, y)
-        if value == value.lower():
-            value = value.upper()
+        Returns:
+            mixed -- False if (r, c) is out-of-bounds else cell value
+        """
+        if 0 <= r < len(self.matrix) and 0 <= c < len(self.matrix):
+            return self.matrix[r][c]
         else:
-            value = value.lower()
+            False
 
-        r, c = x, y
-        if d == 'u':
-            self.set(' ', x, y)
-            r -= 1
-            self.set(value, r, c)
-        elif d == 'd':
-            self.set(' ', x, y)
-            r += 1
-            self.set(value, r, c)
-        elif d == 'l':
-            self.set(' ', x, y)
-            c -= 1
-            self.set(value, r, c)
-        elif d == 'r':
-            self.set(' ', x, y)
-            c += 1
-            self.set(value, x, y + 1)
+    def set(self, value, r, c, force = False):
+        """Set cell value
+        
+        Parameters:
+            value {str} -- value to assign
+            r {int} -- zero-based row number
+            c {int} -- zero-based column number
+            force {bool} -- overwrite value on non-empty cells
+        
+        Returns:
+            bool
+        """
+        if 0 <= r < len(self.matrix) and 0 <= c < len(self.matrix) and (force == True or self.get(r, c) == ' '):
+            self.matrix[r][c] = value
+            return True
+        else:
+            return False
 
-        if len(self.check(r, c)) > 0:
-            return value
+    def flip(self, r, c, d, force = False):
+        """Flip cell in one of the 4 cardinal directions
+        
+        Parameters:
+            r {int} -- zero-based row number
+            c {int} -- zero-based column number
+            d {str} -- flip direction, (u, d, l, r)
+            force {bool} -- overwrite value on non-empty cells
+
+        Returns:
+            mixed -- (r, c) coordinates of flipped cell, False on fail
+        """
+        value = self.get(r, c)
+
+        if value.islower():
+            value = value.upper()
+
+        d = d.lower()[0]
+        
+
+        if d in self.canflip(r, c) or force == True:
+            self.set(' ', r, c, True)
+
+            if d == 'u':   
+                r -= 1         
+            elif d == 'd':
+                r += 1
+            elif d == 'l':
+                c -= 1
+            elif d == 'r':
+                c += 1
+
+            if self.set(value, r, c, force):
+                return (r, c)
+
+        return False
+
+    def canflip(self, r, c):
+        """Check if the cell value can still be flipped
+        
+        Parameters:
+            r {int} -- zero-based row number
+            c {int} -- zero-based column number
+        
+        Returns:
+            tuple -- directions cell can be flipped to
+        """
+        directions = {
+            'u': (r - 1, c),
+            'd': (r + 1, c),
+            'l': (r, c - 1),
+            'r': (r, c + 1),
+        }
+
+        flippable = []
+
+        for d, (_r, _c) in directions.items():
+            if self.get(_r, _c) == ' ':
+                flippable.append(d)
+
+        return tuple(flippable)
+
+    def check(self, r, c):
+        """Check if (r, c) value existing at least there times in a row vertically, horizontally, or diagonally
+        
+        Parameters:
+            r {int} -- zero-based row number
+            c {int} -- zero-based column number
+        
+        Returns:
+            bool
+        """        
+        value = self.get(r, c)
+
+        if str(value * 3) in ''.join(self.row(r)):
+            return True
+
+        if str(value * 3) in ''.join(self.column(c)):
+            return True            
+
+        for direction, values in self.diagonals(r, c).items():
+            if str(value * 3) in ''.join(values):
+                return True
+
+        return False
+
+    def over(self):
+        """Check if there are no more moves left
+
+        Returns:
+            bool
+        """
+        for _r in range(len(self.matrix)):
+            if len(''.join(self.row(_r)).strip()) < len(self.matrix):
+                return False
         
         return True
 
-    def can_flip(self, x, y):
+    def win(self, x, y):
         """
-        Checks if the cell value can still be flipped
-        
-        Parameters:
-            x {int} -- zero-based row number
-            y {int} -- zero-based column number
-        
-        Returns:
-            can_go {list} -- contains the directions the cell value can flip to
-        """
-        can_go = []
-
-        if self.get(x, y) != ' ':
-            if x > 0:
-                if self.get(x - 1, y) == ' ':
-                    can_go.append('u')
-
-            if x < 3:
-                if self.get(x + 1, y) == ' ':
-                    can_go.append('d')
-
-            if y > 0:
-                if self.get(x, y - 1) == ' ':
-                    can_go.append('l')
-
-            if y < 3:
-                if self.get(x, y + 1) == ' ':
-                    can_go.append('r')
-
-        return can_go
-
-    def check(self, x, y):
-        """
-        Checks if there is a line of 3 of the same value vertically, horizontally, or diagonally
-        
-        Parameters:
-            x {int} -- zero-based row number
-            y {int} -- zero-based column number
-        
-        Returns:
-            lines {tuple} -- contains the line/s made, with the coordinates of the start of the line, or False
-            (The lines can either be 'v', 'h', 'd+', or 'd-', which represents the orientations
-            vertical, horizontal, diagonal with positive slope, and diagonal with negative slope,
-            respectively.
-        """
-        value = self.get(x, y)
-
-        lines = []
-
-        if value == ' ':
-            return lines
-
-        if value*3 in self.column(y):
-            lines.append(('v', self.column(y).index(value), y))
-        elif self.column(y).count(value) == 4:
-            lines.append(('v4', 0, y))
-
-        if value*3 in self.row(x):
-            lines.append(('h', x, self.row(x).index(value)))
-        elif self.row(x).count(value) == 4:
-            lines.append(('h4', x, 0))
-
-        d4 = True
-        for i in range(4):
-            if self.matrix[3 - i][i] != value:
-                d4 = False
-                break
-        if d4:
-            lines.append(('d4+', 0, 3))
-        elif x > 1 and y < 2:
-            for i in range(3):
-                if self.get(x - 1, y + 1) != value:
-                    break
-                if i == 2:
-                    lines.append(('d+', x - 2, y + 2))
-        elif 0 < x < 3 and 0 < y < 3:
-            for i in range(3):
-                if self.get(x + 1 - i, y - 1 + i) != value:
-                    break
-                if i == 2:
-                    lines.append(('d+', x - 1, y + 1))
-        elif x < 2 and y > 1:
-            for i in range(3):
-                if self.get(x + i, y - i) != value:
-                    break
-                if i == 2:
-                    lines.append(('d+', x, y))
-
-        d4 = True
-        for i in range(4):
-            if self.get(i, i) != value:
-                d4 = False
-                break
-        if d4:
-            lines.append(('d4-', 0, 0))
-        elif x < 2 and y < 2:
-            for i in range(3):
-                if self.get(x + i, y + i) != value:
-                    break
-                if i == 2:
-                    lines.append(('d-', x, y))
-        elif 0 < x < 3 and 0 < y < 3:
-            for i in range(3):
-                if self.get(x - 1 + i, y - 1 + i) != value:
-                    break
-                if i == 2:
-                    lines.append(('d-', x - 1, y - 1))
-        elif x > 1 and y > 1:
-            for i in range(3):
-                if self.get(x - i, y - i) != value:
-                    break
-                if i == 2:
-                    lines.append(('d-', x - 2, y - 2))
-
-        return lines
-
-    def won(self, x, y):
-        """
-        Checks if there is a line that can no longer be flipped out of place.
-        (a player has won)
+        Check if there is a line that can no longer be flipped out of place.
         
         Parameters:
             x {int} -- zero-based row number

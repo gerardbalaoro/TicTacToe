@@ -15,7 +15,7 @@
    - **Windows:**
 
 		```
-		./env/bin/activate
+        "env/scripts/activate"
 		```
 
    - **Linux/Unix:** 
@@ -29,3 +29,7 @@
    ```
    pip install requirements.txt
    ```
+
+### Test Game Engine
+
+To test the game engine, simply run the **test.py**.
