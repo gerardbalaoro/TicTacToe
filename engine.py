@@ -249,7 +249,7 @@ class FlipMode:
             c {int} -- zero-based column number
         
         Returns:
-            mixed -- False if (r, c) is out-of-bounds else cell value
+            mixed -- cell value, False if (r, c) does not exist
         """
         if 0 <= r < len(self.matrix) and 0 <= c < len(self.matrix):
             return self.matrix[r][c]
@@ -266,7 +266,7 @@ class FlipMode:
             force {bool} -- overwrite value on non-empty cells
         
         Returns:
-            bool
+            bool -- True on success, False on fail
         """
         if 0 <= r < len(self.matrix) and 0 <= c < len(self.matrix) and (force == True or self.get(r, c) == ' '):
             self.matrix[r][c] = value
@@ -372,6 +372,7 @@ class FlipMode:
         
         return True
 
+    # NOTE: Remove if function overlaps with `over` method or depracated. This code uses hard-coded syntax
     def win(self, x, y):
         """
         Check if there is a line that can no longer be flipped out of place.
