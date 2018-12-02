@@ -217,12 +217,13 @@ class FlipMode:
         """
         return tuple([row[n] for row in self.matrix])
 
-    def diagonals(self, r, c):
+    def diagonals(self, r, c, coordinates = False):
         """Get diagonal values intersecting (r, c) coodinates
 
         Parameters:
             r {int} -- a zero based row number
             c {int} -- a zero based column number
+            coodinates {bool} -- returns cell coordinates instead of values
 
         Returns:
             dict -- forward and backward diagonal values
@@ -233,11 +234,17 @@ class FlipMode:
         for x in range(len(self.matrix)):
             y = (x - r) + c
             if 0 <= y < len(self.matrix):
-                forwards.append(self.get(x, y))
+                if coordinates:
+                    forwards.append((x, y))
+                else:
+                    forwards.append(self.get(x, y))
 
             y = (r + x) + c
             if 0 <= y < len(self.matrix):
-                backwards.append(self.get(x, y))
+                if coordinates:
+                    backwards.append((x, y))
+                else:
+                    backwards.append(self.get(x, y))
 
         return {'forward': tuple(forwards), 'backward': tuple(backwards)}        
 
@@ -337,7 +344,8 @@ class FlipMode:
         return tuple(flippable)
 
     def check(self, r, c):
-        """Check if (r, c) value existing at least there times in a row vertically, horizontally, or diagonally
+        """Check if (r, c) value exists at least three times consecutively lines in any direction (horizontal, vertical, diagonal)
+        intersecting with (r, c)
         
         Parameters:
             r {int} -- zero-based row number
@@ -367,69 +375,42 @@ class FlipMode:
             bool
         """
         for _r in range(len(self.matrix)):
-            if len(''.join(self.row(_r)).strip()) < len(self.matrix):
+            if self.row(_r).count(' ') > 0:
                 return False
         
         return True
 
-    # NOTE: Remove if function overlaps with `over` method or depracated. This code uses hard-coded syntax
-    def win(self, x, y):
-        """
-        Check if there is a line that can no longer be flipped out of place.
+    def check_unflippable(self, r, c):
+        """Check if (r, c) value exists at least three times consecutively lines in any direction (horizontal, vertical, diagonal)
+        intersecting with (r, c) and if all cells in that direction can no longer be flipped
         
         Parameters:
-            x {int} -- zero-based row number
-            y {int} -- zero-based column number
+            r {int} -- zero-based row number
+            c {int} -- zero-based column number
         
         Returns:
-            value {str} -- the value that won or '-' if there is a draw, or
-            False if otherwise
+            bool
         """
+        value = self.get(r, c)
+        size = len(self.matrix)
 
-        if ' ' not in ''.join([''.join(self.row(r)) for r in range(4)]):
-            return '-'
+        if str(value * 3) in ''.join(self.row(r)):
+            for y in range(size):
+                if len(self.canflip(r, y)) != 0:
+                    return False
+            return True
 
-        value = self.get(x, y)
-        lines = self.check(x, y)
+        if str(value * 3) in ''.join(self.column(c)):
+            for x in range(size):
+                if len(self.canflip(x, c)) != 0:
+                    return False
+            return True           
 
-        if len(lines) > 0:
-            for line in lines:
-                d, x, y = line[0], int(line[1]), int(line[2])
-                
-                if d == 'v':
-                    for i in range(3):
-                        if len(self.can_flip(x + i, y)) > 0:
-                            return False
-                elif d == 'v4':
-                    for i in range(4):
-                        if len(self.can_flip(x + i, y)) > 0:
-                            return False
-                        
-                elif d == 'h':
-                    for i in range(3):
-                        if len(self.can_flip(x, y + i)) > 0:
-                            return False
-                elif d == 'h4':
-                    for i in range(4):
-                        if len(self.can_flip(x, y + i)) > 0:
-                            return False
-                        
-                elif d == 'd+':
-                    for i in range(3):
-                        if len(self.can_flip(x + i, y - i)) > 0:
-                            return False
-                elif d == 'd4+':
-                    for i in range(4):
-                        if len(self.can_flip(x + i, y - i)) > 0:
-                            return False
-            
-                elif d == 'd-':
-                    for i in range(3):
-                        if len(self.can_flip(x + i, y + i)) > 0:
-                            return False
-                elif d == 'd4-':
-                    for i in range(4):
-                        if len(self.can_flip(x + i, y + i)) > 0:
-                            return False
-                    
-                return value
+        for direction, coordinates in self.diagonals(r, c, True).items():
+            if str(value * 3) in ''.join([self.get(x, y) for x, y in coordinates]):
+                for x, y in coordinates:
+                    if len(self.canflip(x, y)) != 0:
+                        return False
+                return True
+
+        return False

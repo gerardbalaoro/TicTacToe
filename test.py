@@ -94,7 +94,7 @@ def flip():
                 # Check if set is successful
                 if move:
                     # Check for winners
-                    if board.check(int(inpt[0]), int(inpt[1])):
+                    if board.check_unflippable(int(inpt[0]), int(inpt[1])):
                         winner = player
                         break
                     # Change current player
