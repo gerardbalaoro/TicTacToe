@@ -11,7 +11,6 @@ class TicTacToe:
             size {int} -- length of board sides (default: {3})
         """
         self.matrix = [[' '] * size for row in range(size)]
-        self.history = []
         self.snapshots = []
         self.clipboard = None
 
@@ -160,23 +159,6 @@ class TicTacToe:
         
         return True
 
-    def record(self, action, *args):
-        """Record action to history
-
-        Usage:
-            self.record('set', 'x', 0, 0)
-
-        Arguments:
-            action {str} -- method name
-            *args -- variable-length argument list
-        """      
-        self.history.append({'action': action, 'params': args})
-
-    def replay(self):
-        """Replay recorded actions from history"""
-        for record in self.history:
-            getattr(self, record['action'])(*record['params'])
-
     def capture(self):
         """Capture current board state to clipboard"""
         self.clipboard = deepcopy(self.matrix)
@@ -194,7 +176,8 @@ class TicTacToe:
             index {int} -- snapshot index (default: {-1})
         """
         try:
-            self.matrix = self.snapshots[index].copy()
+            self.matrix = deepcopy(self.snapshots[index])
+            del self.snapshots[index]
         except IndexError:
             pass
 
