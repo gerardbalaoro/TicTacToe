@@ -3,16 +3,13 @@ from argparse import ArgumentParser
 from engine import *
 from session import *
 
-
 def clear():
     """Clear console"""
     _cls = os.system('cls' if os.name == 'nt' else 'clear')
 
-
 def banner():
     """Print Game Banner"""
     print(tb.DoubleTable(['TICTACTOE']).table)
-
 
 def start():
     """Show Game Start Menu"""
@@ -36,10 +33,14 @@ def game(mode, player, board):
     # Print board
     print(board.board, end='\n\n')
 
-
-def end(winner=None):
+def end(mode, board, winner=None):
     """Show Game Over Screen"""
-    print(tb.DoubleTable([[f'GAME OVER', f'Player {winner} Wins' if winner != None else 'No Winners']]).table)
+    clear()
+    banner()
+    print(tb.DoubleTable([[f'Playing {mode}']]).table, end='\n\n')
+    # Print Board
+    print(board.board, end='\n\n')
+    print(tb.DoubleTable([[f'GAME OVER', f'Player {winner} Wins' if winner != None else 'No Winners']]).table, end='\n\n')
     input("Press Any Key To Continue\n")
 
 
@@ -128,24 +129,24 @@ def flip():
                 continue
     
     # Show game over screen
-    game('Flip Mode', player, board)
-    end(winner)
+    end('Flip Mode', board, winner)
 
 
 def ulimate():
     """Play Ultimate Mode"""
-    B = UltimateTicTac()
+    board = UltimateTicTac()
 
     locked = False
     player = 1
+    winner = None
     ctr = 0
 
     while True:        
         # Set up screen
-        game('Ultimate Mode', player, B)
+        game('Ultimate Mode', player, board)
 
         # Prompt player for input
-        prompt = 'Select Board <x>, <y>' if not locked else 'Move <row>, <column>'
+        prompt = 'Select Board <x>, <y>' if not locked else f'Activte Board ({x}, {y}) : Move <row>, <column>'
         inp = [args.strip() for args in input(f'{prompt} | <quit> : ').split(',')]
         
         # If user typed 'quit', exit to main menu
@@ -159,40 +160,45 @@ def ulimate():
         # If board is not locked, parse input as board coordinates
         if not locked:
             x, y = int(inp[0]), int(inp[1])
-            locked = True
+            if board.get(x, y) == ' ':
+                locked = True
             continue
         else:
             # else, parse input as cell coordinates
             ix, iy = int(inp[0]), int(inp[1])
 
-        if B.get(x, y, ix, iy) == ' ':
-            value = 'x' if player == 1 else 'o'
-            B.set(value, x, y, ix, iy)
+        value = 'x' if player == 1 else 'o'
 
-            check = B.check(x, y, ix, iy)
-            if check is not False:
-                B.set(check[0], x, y)
+        # Capture board state
+        board.capture()
 
-                check = B.check(x, y)
-                if check is not False:
-                    print('\n')
-                    if check[0] == '-':
-                        end(None)
-                    elif check[0] == 'x':
-                        end('1')
-                    else:
-                        end('2')
+        if board.set(value, ix, iy, (x ,y)):
+            board.savesnap()
+
+            if board.check(ix, iy, (x ,y)):
+                board.set(value, x, y)
+            
+                if board.check(x, y):
+                    winner == player
                     break
 
-            if B.big[ix][iy] == ' ':
-                locked = True
-                x, y = ix, iy
-            else:
-                locked = False
+            game('Ultimate Mode', player, board)
+            endturn = input('End Turn <enter> | Undo Last Mode <undo> : ')
+            if endturn.strip().lower() == 'undo':
+                board.restore()
+                continue
+            else:                   
+                if board.get(x, y) == ' ':
+                    locked = True
+                    x, y = ix, iy
+                else:
+                    locked = False
 
-            # Change player
-            player = 1 if player == 2 else 2
-
+                # Change player
+                player = 1 if player == 2 else 2
+        else:
+            continue
+    end('Ultimate Mode', board, winner)
 
 #: ---------------------------
 #: Main Game Runner
