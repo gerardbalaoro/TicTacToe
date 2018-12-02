@@ -3,13 +3,16 @@ from argparse import ArgumentParser
 from engine import *
 from session import *
 
+
 def clear():
     """Clear console"""
     _cls = os.system('cls' if os.name == 'nt' else 'clear')
 
+
 def banner():
     """Print Game Banner"""
     print(tb.DoubleTable(['TICTACTOE']).table)
+
 
 def start():
     """Show Game Start Menu"""
@@ -33,10 +36,12 @@ def game(mode, player, board):
     # Print board
     print(board.board, end='\n\n')
 
-def end(winner = None):
+
+def end(winner=None):
     """Show Game Over Screen"""
     print(tb.DoubleTable([[f'GAME OVER', f'Player {winner} Wins' if winner != None else 'No Winners']]).table)
     input("Press Any Key To Continue\n")
+
 
 def flip():
     """Play Flip Mode"""
@@ -126,6 +131,7 @@ def flip():
     game('Flip Mode', player, board)
     end(winner)
 
+
 def ulimate():
     """Play Ultimate Mode"""
     B = UltimateTicTac()
@@ -164,11 +170,11 @@ def ulimate():
             B.set(value, x, y, ix, iy)
 
             check = B.check(x, y, ix, iy)
-            if check != False:
+            if check is not False:
                 B.set(check[0], x, y)
 
                 check = B.check(x, y)
-                if check != False:
+                if check is not False:
                     print('\n')
                     if check[0] == '-':
                         end(None)
@@ -187,15 +193,17 @@ def ulimate():
             # Change player
             player = 1 if player == 2 else 2
 
+
 #: ---------------------------
 #: Main Game Runner
 #: ---------------------------
+
 if __name__ == '__main__':
     # Activate Debugger (Local Environment Only)
     p = ArgumentParser()
     p.add_argument('--debug', '-d', type=bool, default=False)
     args = p.parse_args()
-    if args.debug == True:
+    if args.debug is True:
         import ptvsd
         print("Waiting for debugger attach")
         ptvsd.enable_attach(address=('localhost', 5678), redirect_output=True)

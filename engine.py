@@ -59,7 +59,7 @@ class TicTacToe:
         """
         return tuple([row[n] for row in self.matrix])
 
-    def diagonals(self, r, c, coordinates = False):
+    def diagonals(self, r, c, coordinates=False):
         """Get diagonal values intersecting (r, c) coodinates
 
         Parameters:
@@ -103,9 +103,9 @@ class TicTacToe:
         if 0 <= r < self.size and 0 <= c < self.size:
             return self.matrix[r][c]
         else:
-            False
+            return False
 
-    def set(self, value, r, c, force = False):
+    def set(self, value, r, c, force=False):
         """Set cell value
         
         Parameters:
@@ -369,7 +369,7 @@ class FlipTacToe(TicTacToe):
         """Initialize board matrix"""
         super().__init__(4)
 
-    def flip(self, r, c, d, force = False):
+    def flip(self, r, c, d, force=False):
         """Flip cell in one of the 4 cardinal directions
         
         Parameters:
@@ -387,9 +387,8 @@ class FlipTacToe(TicTacToe):
             value = value.upper()
 
         d = d.lower()[0]
-        
 
-        if d in self.canflip(r, c) or force == True:
+        if d in self.canflip(r, c) or force is True:
             self.set(' ', r, c, True)
 
             if d == 'u':   
@@ -402,7 +401,7 @@ class FlipTacToe(TicTacToe):
                 c += 1
 
             if self.set(value, r, c, force):
-                return (r, c)
+                return r, c
 
         return False
 
