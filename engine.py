@@ -181,6 +181,7 @@ class UltimateMode:
 
         return False
 
+
 class FlipMode:
     """FlipTacToe Board Class"""
 
@@ -217,7 +218,7 @@ class FlipMode:
         """
         return tuple([row[n] for row in self.matrix])
 
-    def diagonals(self, r, c, coordinates = False):
+    def diagonals(self, r, c, coordinates=False):
         """Get diagonal values intersecting (r, c) coodinates
 
         Parameters:
@@ -261,9 +262,9 @@ class FlipMode:
         if 0 <= r < len(self.matrix) and 0 <= c < len(self.matrix):
             return self.matrix[r][c]
         else:
-            False
+            return False
 
-    def set(self, value, r, c, force = False):
+    def set(self, value, r, c, force=False):
         """Set cell value
         
         Parameters:
@@ -275,13 +276,13 @@ class FlipMode:
         Returns:
             bool -- True on success, False on fail
         """
-        if 0 <= r < len(self.matrix) and 0 <= c < len(self.matrix) and (force == True or self.get(r, c) == ' '):
+        if 0 <= r < len(self.matrix) and 0 <= c < len(self.matrix) and (force is True or self.get(r, c) == ' '):
             self.matrix[r][c] = value
             return True
         else:
             return False
 
-    def flip(self, r, c, d, force = False):
+    def flip(self, r, c, d, force=False):
         """Flip cell in one of the 4 cardinal directions
         
         Parameters:
@@ -299,9 +300,8 @@ class FlipMode:
             value = value.upper()
 
         d = d.lower()[0]
-        
 
-        if d in self.canflip(r, c) or force == True:
+        if d in self.canflip(r, c) or force is True:
             self.set(' ', r, c, True)
 
             if d == 'u':   
@@ -314,7 +314,7 @@ class FlipMode:
                 c += 1
 
             if self.set(value, r, c, force):
-                return (r, c)
+                return r, c
 
         return False
 
