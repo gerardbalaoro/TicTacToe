@@ -1,6 +1,7 @@
 import terminaltables as tb, os
 from argparse import ArgumentParser
 from engine import *
+from session import *
 
 def clear():
     """Clear console"""
@@ -20,21 +21,26 @@ def start():
         menu = tb.DoubleTable(modes.items())
         menu.inner_heading_row_border = False
         print(menu.table)
-        selected = input('Select Option: ')
+        selected = input('Select Option: ').upper()
     return selected
 
-def status(mode, player):
-    """Show Game Status"""
-    print(tb.DoubleTable([[f'Playing {mode}', f'Player {player}\'s Turn']]).table)
+def game(mode, player, board):
+    """Show Game Screen"""
+    clear()
+    banner()
+    print(tb.DoubleTable([[f'Playing {mode}', f'Player {player}\'s Turn']]).table, end='\n\n')
+    
+    # Print board
+    print(board.board, end='\n\n')
 
 def end(winner = None):
     """Show Game Over Screen"""
     print(tb.DoubleTable([[f'GAME OVER', f'Player {winner} Wins' if winner != None else 'No Winners']]).table)
-    input("Press Any Key To Continue")
+    input("Press Any Key To Continue\n")
 
 def flip():
     """Play Flip Mode"""
-    board = FlipMode()
+    board = FlipTacToe()
     # Current Player
     player = 1
     # Winner
@@ -42,19 +48,11 @@ def flip():
     # Prompt the Player to Flip
     flip = False
 
+    session = Session()
+
     while True:
-        # Set up the screen
-        clear()
-        banner()
-        status('Flip Mode', player)
-        print('')
-        
-        # Print board
-        _board = tb.DoubleTable(board.matrix)
-        _board.inner_heading_row_border = False
-        _board.inner_row_border = True
-        print(_board.table)
-        print('')
+
+        game('Flip Mode', player, board)       
 
         # Check if there are still movable pieces, otherwise end the game
         if board.over():
@@ -71,6 +69,7 @@ def flip():
         # Check if input should be parsed as flip or set
         if flip:
             if len(inpt) == 3:
+
                 flipped = board.flip(int(inpt[0]), int(inpt[1]), inpt[2])
 
                 # Check if flip successful
@@ -89,18 +88,33 @@ def flip():
                 continue
         else:
             if len(inpt) == 2:
+
+                # Capture board
+                board.capture()
+
                 move = board.set('x' if player == 1 else 'o', int(inpt[0]), int(inpt[1]))
 
                 # Check if set is successful
                 if move:
+
+                    # Save snaphot
+                    board.savesnap()
+
                     # Check for winners
                     if board.check_unflippable(int(inpt[0]), int(inpt[1])):
                         winner = player
                         break
-                    # Change current player
-                    player = 1 if player == 2 else 2
-                    # Next move should be flip
-                    flip = True
+
+                    game('Flip Mode', player, board)
+                    endturn = input('End Turn <enter> | Undo Last Mode <undo> : ')
+                    if endturn.strip().lower() == 'undo':
+                        board.restore()
+                        continue
+                    else:
+                        # Change current player
+                        player = 1 if player == 2 else 2
+                        # Next move should be flip
+                        flip = True
                 else:
                     # Action failed, try again
                     continue
@@ -109,11 +123,12 @@ def flip():
                 continue
     
     # Show game over screen
+    game('Flip Mode', player, board)
     end(winner)
 
 def ulimate():
     """Play Ultimate Mode"""
-    B = UltimateMode()
+    B = UltimateTicTac()
 
     locked = False
     player = 1
@@ -121,13 +136,7 @@ def ulimate():
 
     while True:        
         # Set up screen
-        clear()
-        banner()
-        status('Ultimate Mode', player)
-        print('')
-
-        # Print board
-        B.string()
+        game('Ultimate Mode', player, B)
 
         # Prompt player for input
         prompt = 'Select Board <x>, <y>' if not locked else 'Move <row>, <column>'
@@ -184,7 +193,7 @@ def ulimate():
 if __name__ == '__main__':
     # Activate Debugger (Local Environment Only)
     p = ArgumentParser()
-    p.add_argument('--debug', '-p', type=bool, default=False)
+    p.add_argument('--debug', '-d', type=bool, default=False)
     args = p.parse_args()
     if args.debug == True:
         import ptvsd
