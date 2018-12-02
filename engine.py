@@ -45,7 +45,7 @@ class UltimateMode:
                 for y in range(3):
                     if inner_x != 2:
                         if self.get(x, y) != ' ':
-                            out += ('|' + ' '*17)
+                            out += ('|' + ' '*15)
                         else:
                             out += ('|  ' + '-' * 11 + '  ')
                         if y == 2:
