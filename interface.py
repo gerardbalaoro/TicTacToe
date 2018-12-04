@@ -1,12 +1,15 @@
 import pyglet
 from pyglet.gl import *
+from engine import *
 
 class Window(pyglet.window.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        
         self.background = pyglet.image.load('resources/main_menu.jpg')
         self.currentscreen = 'Main Menu'
+        self.playing = False
+        self.sprites = []
         self.main()
 
     def on_draw(self):
@@ -15,6 +18,12 @@ class Window(pyglet.window.Window):
         bg = pyglet.sprite.Sprite(self.background, x=0, y=0)
         bg.scale = 0.5
         bg.draw()
+
+        x = pyglet.sprite.Sprite(pyglet.image.load('resources/x.png'))
+
+        if self.playing:
+            for i in range(3):
+                x.draw()
 
     def on_mouse_press(self, x, y, button, modifiers):
         if self.currentscreen == 'Main Menu':
@@ -37,8 +46,10 @@ class Window(pyglet.window.Window):
 
         elif self.currentscreen[0] == 'Board':
             """Board Clicking"""
+            print(f'You clicked inside the board! {x} {y}')
             if ((x in range(45, 243) and y in range(48, 62)) or
                     (x in range(80, 180) and y in range(62, 110))):
+                print('You clicked inside the board! ')
                 self.save(self.currentscreen)
                 
 
@@ -69,11 +80,13 @@ class Window(pyglet.window.Window):
 
         if mode == '3x3':
             self.background = pyglet.image.load('resources/3x3_game.jpg')
+            self.playing = True
         elif mode == 'Flip':
             self.background = pyglet.image.load('resources/flip_game.jpg')
         elif mode == 'Ulti':
             self.background = pyglet.image.load('resources/ultimate_game.jpg')
 
+    
 def app():
     pyglet.app.run()
 
