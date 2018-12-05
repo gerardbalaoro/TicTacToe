@@ -186,7 +186,7 @@ class Interface(pyglet.window.Window):
                             else: 
                                 if not self.game.is_player_piece(r, c):                             
                                     flippable = self.game.engine.canflip(r, c, True)                                
-                                    if len(flippable) > 0:
+                                    if flippable is not False and len(flippable) > 0:
                                         self.game.to_flip = (r, c)                                    
                                         self.drawables['tiles']['{},{}'.format(r, c)].focused = True
                                         self.board.clear_arrows()
