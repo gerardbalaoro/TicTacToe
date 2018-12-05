@@ -15,9 +15,9 @@ class Interface(pyglet.window.Window):
         # Game Image Assets
         self.images = {
             'start': pyglet.image.load('resources/main_menu.jpg'),
-            'background': pyglet.image.load('objects/background.png'),
-            'player_1': pyglet.image.load('objects/player_1.png'),
-            'player_2': pyglet.image.load('objects/player_2.png'),
+            'background': pyglet.image.load('images/background.png'),
+            'player_1': pyglet.image.load('images/player_1.png'),
+            'player_2': pyglet.image.load('images/player_2.png'),
         }
 
         # Mouse Cursors
