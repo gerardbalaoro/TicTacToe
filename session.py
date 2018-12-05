@@ -73,14 +73,14 @@ class Session:
         self.updated_at = datetime.datetime.now().strftime('%Y-%m-%d %I:%M:%S %p')
         self.unsaved = True
     
-    def save(self, name):  
+    def write(self, name):  
         """Write session data to a .sav file
 
         Arguments:
             name {str} -- file name
         """    
         sav = self.savfile(name)
-        json.dump(self.all, sav)        
+        json.dump(self.all, sav, indent=True)        
         self.unsaved = False
         sav.close()
 
@@ -96,20 +96,26 @@ class Session:
         self.created_at = data['created_at']
         self.updated_at = data['updated_at']
         self.unsaved = False        
-        sav.close()        
+        sav.close()      
 
-    def savfile(self, name, mode='w+'):
+    def savfile(self, name, mode='w+', find=False):
         """Open save file
 
         Arguments:
             name {str} -- file name
             mode {str} -- open mode
+            find {bool} -- find file
 
         Returns:
-            _io.TextIOWrapper
+            mixed
         """
-        path = f'saves/{name}.sav'
-        if 'w' in mode:
+        path = 'saves/{}.sav'.format(name)
+
+        if 'w' in mode and not find:
             os.makedirs(os.path.dirname(path), exist_ok=True)
-        self.path = path
-        return open(path, mode)
+
+        if find:
+            return os.path.exists(path) and os.path.isfile(path)
+        else:
+            self.path = path
+            return open(path, mode)

@@ -369,9 +369,9 @@ class UltimateTicTac(TicTacToe):
 class FlipTacToe(TicTacToe):
     """FlipTacToe Board Class"""
 
-    def __init__(self):
+    def __init__(self, size=4):
         """Initialize board matrix"""
-        super().__init__(4)
+        super().__init__(size)
 
     def flip(self, r, c, d, force=False):
         """Flip cell in one of the 4 cardinal directions
@@ -389,6 +389,8 @@ class FlipTacToe(TicTacToe):
 
         if value.islower():
             value = value.upper()
+        else:
+            value = value.lower()
 
         d = d.lower()[0]
 
@@ -409,15 +411,16 @@ class FlipTacToe(TicTacToe):
 
         return False
 
-    def canflip(self, r, c):
+    def canflip(self, r, c, coordinates=False):
         """Check if the cell value can still be flipped
         
         Parameters:
             r {int} -- zero-based row number
-            c {int} -- zero-based column number
-        
+            c {int} -- zero-based column
+            coordinates {bool} -- return flippable directions coordinates 
+            
         Returns:
-            tuple -- directions cell can be flipped to
+            tuple/dict -- directions cell can be flipped to
         """
         directions = {
             'u': (r - 1, c),
@@ -427,12 +430,17 @@ class FlipTacToe(TicTacToe):
         }
 
         flippable = []
+        cells = {}
+
+        if self.get(r, c) == ' ':
+            return False
 
         for d, (_r, _c) in directions.items():
             if self.get(_r, _c) == ' ':
                 flippable.append(d)
+                cells[d] = (_r, _c)
 
-        return tuple(flippable)
+        return cells if coordinates else tuple(flippable)
 
     def check_unflippable(self, r, c):
         """Check if (r, c) value exists at least three times consecutively lines in any direction (horizontal, vertical, diagonal)
