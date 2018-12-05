@@ -7,8 +7,9 @@ class Board(pyglet.sprite.Sprite):
         self.y = center_y - (self.height / 2)
         self.size = size
         self.tiles = {}
+        self.arrows = {}
         self.margin = margin
-        self.tilesize = tilesize
+        self.tilesize = tilesize if tilesize is not None else 103
         self.padding = padding
 
     def collide(self, x, y):
@@ -30,29 +31,39 @@ class Board(pyglet.sprite.Sprite):
         return False
 
     def add_tile(self, name, row, col, alt=False):
-        scale = self.tilesize / 103
-        row, col = float(row), float(col)
         cellx = (self.x) + (self.tilesize * col) + (self.margin * (col + 1))
         celly = (self.y + self.height) - ((self.tilesize + self.margin) * (row + 1))
-        self.tiles['{},{}'.format(row, col)] = Button(name, cellx, celly, alt)
+        tile = Button(name, cellx, celly, alt)
+        tile.scale = self.tilesize / 103
+        self.tiles['{},{}'.format(row, col)] = tile
+
+    def add_arrow(self, d, row, col):
+        celly = (self.y + self.height) - ((self.tilesize + self.margin) * (row + 1))
+        arrow = Button('arrow_{}'.format(d))
+        arrow.x = ((self.x) + ((self.tilesize + self.margin) * (col + 1)) - (self.tilesize / 2)) - (arrow.width / 2)
+        arrow.y = (celly) + (self.tilesize / 2) - (arrow.height / 2)     
+        self.arrows['{},{}'.format(row, col)] = arrow
 
     def clear_tiles(self):
         self.tiles = {}
+
+    def clear_arrows(self):
+        self.arrows = {}
 
 class Button(pyglet.sprite.Sprite):
 
     def __init__(self, name, x=0, y=0, alt=False):
         super().__init__(pyglet.image.load('images/{}.png'.format(name)), x=x, y=y)
-        self.name = name
-        self.state = None
-        self.alt = alt
-
+        self.set_image(name, alt, None)
+        
     def set_state(self, value:int):
-        path = 'images/{}.png'.format('_'.join([str(x) for x in [self.name, 'alt' if self.alt else None, value] if x is not None]))
+        self.set_image(self.name, self.alt, value)
+        
+    def set_image(self, name, alt=False, state=None):
+        self.name, self.state, self.alt = name, state, alt
+        path = 'images/{}.png'.format('_'.join([str(x) for x in [self.name, 'alt' if self.alt else None, self.state] if x is not None]))
         if os.path.exists(path):
             self.image = pyglet.image.load(path)
-        self.state = value
-        return self
 
     @property
     def disabled(self):
