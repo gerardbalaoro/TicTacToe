@@ -86,7 +86,8 @@ class Interface(pyglet.window.Window):
                     self.controls[_btn].disabled = not self.game.finished_move
                     if _btn == 'undo' and self.mode == FlipTacToe and self.game.finished_flip and self.game.round != 1:
                         self.controls[_btn].disabled = False
-            
+                        
+            self.controls['player'].image = self.images['player_' + str(self.game.player)]
             self.board.clear_tiles()
             for row, items in enumerate(self.game.engine.items):
                 for col, value in enumerate(items):
@@ -139,7 +140,6 @@ class Interface(pyglet.window.Window):
                                 self.end_screen()                            
                             else:
                                 self.game.player_end_turn()
-                                self.controls['player'].image = self.images['player_' + str(self.game.player)]
                         elif name == 'undo':
                             self.game.player_undo_move()                        
                         elif name == 'quit':
@@ -231,7 +231,7 @@ class Interface(pyglet.window.Window):
 
     def end_screen(self):
         """Render Game Over Screen Elements"""
-        self.canvas = pyglet.sprite.Sprite(self.images['background_light'], x=0, y=0)
+        self.canvas = pyglet.sprite.Sprite(self.images['background_dark'], x=0, y=0)
 
         # Controls
         self.controls = {
