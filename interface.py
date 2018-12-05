@@ -16,6 +16,7 @@ class Interface(pyglet.window.Window):
         self.images = {
             'start': pyglet.image.load('resources/main_menu.jpg'),
             'background': pyglet.image.load('images/background.png'),
+            'background_dark': pyglet.image.load('images/background_dark.png'),
             'player_1': pyglet.image.load('images/player_1.png'),
             'player_2': pyglet.image.load('images/player_2.png'),
         }
@@ -79,12 +80,19 @@ class Interface(pyglet.window.Window):
     def on_mouse_press(self, x, y, button, modifiers):
         """Handle Mouse Press Events"""
 
-        # NOTE: For Debug Only, Print Mouse Coordinates
-        print('Mouse Pressed: {} {} | On Screen: {}'.format(x, y, self.shown))
+        if self.shown in ['game', 'end']:
+            for name, elem in self.controls.items():
+                if elem.collide(x, y) is not False and not elem.disabled:
+                    print('Button Pressed: {}'.format(name))
+                    elem.focused = True
 
-        # Start Screen Mouse Events
+    def on_mouse_release(self, x, y, button, modifiers):
+        """Hande Mouse Release Events"""
+
+        # NOTE: For Debug Only, Print Mouse Coordinates
+        print('Mouse Clicked: {} {} | On Screen: {}'.format(x, y, self.shown))
+
         if self.shown == 'start':
-            
             if x in range(200, 630) and y in range(315, 350):
                 print('Selected Vanilla TicTacToe')
                 self.game.new(TicTacToe())
@@ -98,23 +106,18 @@ class Interface(pyglet.window.Window):
             elif x in range(100, 700) and y in range(150, 190):
                 print('Selected Ultimate TicTacToe')
                 self.game.new(UltimateTicTac())
-                self.help_screen()
+                self.end_screen()
 
             elif ((x in range(100, 220) and y in range(45, 70)) or
                   (x in range(80, 235) and y in range(70, 105))):
                 pass
-
-        # In-Game Screen Mouse Events
-        elif self.shown == 'game':
-
-            # Check if a Control is Clicked
+        elif self.shown in ['game', 'end']:
             for name, elem in self.controls.items():
                 if elem.collide(x, y) is not False and not elem.disabled:
                     print('Button Pressed: {}'.format(name))
-                    elem.focused = True
                     if name == 'end':
                         if self.game.winner is not None:
-                            print('Game Over: Player {} Won'.format(self.game.winner))
+                            self.end_screen()
                         else:
                             self.game.player_end_turn()
                             self.controls['player'].image = self.images['player_' + str(self.game.player)]
@@ -128,36 +131,37 @@ class Interface(pyglet.window.Window):
                         self.drawables['tiles'] = self.board.tiles
                         self.controls['undo'].disabled = True
                         self.controls['end'].disabled = True
+                    elif name == 'continue':
+                        self.start_screen()
+                    elem.focused = False
+            
+            if self.shown == 'game':
+                # Vanilla Mode
+                if self.mode == TicTacToe:
+                    onboardclick = self.board.collide(x, y)
+                    if isinstance(onboardclick, tuple) and self.game.finished_move is False:
+                        r, c = onboardclick
+                        print('Board Cell Clicked: {}, {}'.format(onboardclick[0], c))
+                        if self.game.engine.set(self.game.player_tile, r, c):                    
+                            self.board.add_tile('cross' if self.game.player_tile == 'x' else 'circle', r, c)                
+                            self.drawables['tiles'] = self.board.tiles
+                            self.game.player_end_move()
+                            self.controls['undo'].disabled = False
+                            self.controls['end'].disabled = False
 
-            # Vanilla Mode
-            if self.mode == TicTacToe:
-                onboardclick = self.board.collide(x, y)
-                if isinstance(onboardclick, tuple) and self.game.finished_move is False:
-                    r, c = onboardclick
-                    print('Board Cell Clicked: {}, {}'.format(onboardclick[0], c))
-                    if self.game.engine.set(self.game.player_tile, r, c):                    
-                        self.board.add_tile('cross' if self.game.player_tile == 'x' else 'circle', r, c)                
-                        self.drawables['tiles'] = self.board.tiles
-                        self.game.player_end_move()
-                        self.controls['undo'].disabled = False
-                        self.controls['end'].disabled = False
-
-                        if self.game.engine.check(r, c):
-                            self.game.winner = self.game.player                        
-                    else:
-                        print('Game Error: Set Returned False')
-            
-            # Flip Mode
-            elif self.mode == FlipTacToe:
-                pass
-            
-            # Ultimate Mode
-            elif self.mode == UltimateTicTac:
-                pass
-            
-        # Help Screen Mouse Events
+                            if self.game.engine.check(r, c):
+                                self.game.winner = self.game.player                        
+                        else:
+                            print('Game Error: Set Returned False')
+                
+                # Flip Mode
+                elif self.mode == FlipTacToe:
+                    pass
+                
+                # Ultimate Mode
+                elif self.mode == UltimateTicTac:
+                    pass
         elif self.shown == 'help':
-            
             if x in range(339, 436) and y in range(85, 115):
                 print('Button Clicked: play')                
                 self.game_screen()
@@ -165,20 +169,33 @@ class Interface(pyglet.window.Window):
             elif ((x in range(560, 760) and y in range(480, 500)) or
                   (x in range(610, 720) and y in range(500, 545))):
                 self.start_screen()
-
-    def on_mouse_release(self, x, y, button, modifiers):
-        """Hande Mouse Release Events"""
-        if self.shown == 'game':
-            for name, elem in self.controls.items():
-                if elem.collide(x, y) is not False and not elem.disabled:
-                    elem.focused = False
-
     def start_screen(self):    
         """Render Start Screen Elements"""
         self.canvas = pyglet.sprite.Sprite(self.images['start'], x=0, y=0)
         self.canvas.scale = max(min(self.canvas.height, self.height)/max(self.canvas.height, self.height), min(self.canvas.width, self.width)/max(self.canvas.width, self.width))
         self.drawables = [self.canvas]
         self.showing = 'start'
+
+    def end_screen(self):
+        """Render Game Over Screen Elements"""
+        self.canvas = pyglet.sprite.Sprite(self.images['background_dark'], x=0, y=0)
+
+        # Controls
+        self.controls = {
+            'title': Button('game_over'),
+            'continue': Button('continue'),
+            'winner': Button('winner_{}'.format(self.game.winner) if self.game.winner is not None else 'draw')
+        }
+
+        self.controls['title'].x = (self.width / 2) - (self.controls['title'].width / 2)
+        self.controls['title'].y = (self.height * 0.60) 
+        self.controls['winner'].x = (self.width / 2) - (self.controls['winner'].width / 2)
+        self.controls['winner'].y = (self.height / 2)
+        self.controls['continue'].x = (self.width / 2) - (self.controls['continue'].width / 2)
+        self.controls['continue'].y = (self.height * 0.30)
+
+        self.drawables = {'canvas': self.canvas, 'controls': self.controls}
+        self.showing = 'end'
 
     def game_screen(self):
         """Render Game Screen Elements"""

@@ -10,7 +10,7 @@ class Game:
         Arguments:
             symbols {tuple} -- player symbols (default: {('x', 'o')})
         """
-        self.players = dict(zip((1, 2), players))
+        self.players = dict(zip((1, 2), symbols))
 
     def new(self, engine:TicTacToe=None):
         """Start New Game

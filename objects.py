@@ -2,7 +2,7 @@ import pyglet, os
 
 class Board(pyglet.sprite.Sprite):
     def __init__(self, size=3, center_x=0, center_y=0, margin=10, tilesize=103, padding=2):
-        super().__init__(pyglet.image.load('objects/board_{}.png'.format(size)))
+        super().__init__(pyglet.image.load('images/board_{}.png'.format(size)))
         self.x = center_x - (self.width / 2)
         self.y = center_y - (self.height / 2)
         self.size = size
@@ -42,13 +42,13 @@ class Board(pyglet.sprite.Sprite):
 class Button(pyglet.sprite.Sprite):
 
     def __init__(self, name, x=0, y=0, alt=False):
-        super().__init__(pyglet.image.load('objects/{}.png'.format(name)), x=x, y=y)
+        super().__init__(pyglet.image.load('images/{}.png'.format(name)), x=x, y=y)
         self.name = name
         self.state = None
         self.alt = alt
 
     def set_state(self, value:int):
-        path = 'objects/{}.png'.format('_'.join([str(x) for x in [self.name, 'alt' if self.alt else None, value] if x is not None]))
+        path = 'images/{}.png'.format('_'.join([str(x) for x in [self.name, 'alt' if self.alt else None, value] if x is not None]))
         if os.path.exists(path):
             self.image = pyglet.image.load(path)
         self.state = value
