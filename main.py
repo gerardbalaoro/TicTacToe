@@ -1,6 +1,5 @@
-import interface
-import engine
+from interface import *
+from game import *
 
-window = interface.Window(width=800, height=600, caption='Tic Tac Toe Unlimited', resizable=False)
-
-interface.app()
+window = Interface(Game())
+window.show()
