@@ -26,7 +26,7 @@
 
 
 <hr>
-<h3 align="center"><a href="/screens">View Screenshots</a></h3>
+<h3 align="center"><a href="screens">View Screenshots</a></h3>
 <hr>
 
 

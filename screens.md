@@ -15,5 +15,5 @@
 </p>
 
 <hr>
-<h3 align="center"><a href="/index">Go to Homepage</a></h3>
+<h3 align="center"><a href="index">Go to Homepage</a></h3>
 <hr>
