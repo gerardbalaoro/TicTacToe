@@ -46,7 +46,7 @@
     python main.py
     ```
 
-
+<hr>
 <h2 align="center">Authors</h2>
 
 <p align="center">
@@ -56,7 +56,7 @@
     1st Semester, A.Y. 2018-2019<br>
     University of the Philippines Diliman
 </p>
-
+<hr>
 
 ## Credits
 
