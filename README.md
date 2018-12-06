@@ -26,7 +26,10 @@
 
 
 <hr>
-<h3 align="center"><a href="https://gerardbalaoro.github.io/TicTacToe/screens">View Screenshots</a></h3>
+<h3 align="center">
+    <a href="https://gerardbalaoro.github.io/TicTacToe">Open Website</a> |
+    <a href="https://gerardbalaoro.github.io/TicTacToe/screens">View Screenshots</a>
+</h3>
 <hr>
 
 
