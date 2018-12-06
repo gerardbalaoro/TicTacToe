@@ -16,7 +16,7 @@ class Board(pyglet.sprite.Sprite):
             tilesize {int} -- tile size (default: {103})
             padding {int} -- space between tiles (default: {2})
         """
-        super().__init__(pyglet.image.load('images/board_{}.png'.format(size)))
+        super().__init__(pyglet.image.load('assets/board_{}.png'.format(size)))
         self.x = center_x - (self.width / 2)
         self.y = center_y - (self.height / 2)
         self.size = size
@@ -102,7 +102,7 @@ class Button(pyglet.sprite.Sprite):
             y {int} -- position y (default: {0})
             alt {bool} -- use alternate name (default: {False})
         """
-        super().__init__(pyglet.image.load('images/{}.png'.format(name)), x=x, y=y)
+        super().__init__(pyglet.image.load('assets/{}.png'.format(name)), x=x, y=y)
         self.set_image(name, alt, None)
         
     def set_state(self, value:int):
@@ -122,7 +122,7 @@ class Button(pyglet.sprite.Sprite):
             state {int} -- button state (default: {None})
         """
         self.name, self.state, self.alt = name, state, alt
-        path = 'images/{}.png'.format('_'.join([str(x) for x in [self.name, 'alt' if self.alt else None, self.state] if x is not None]))
+        path = 'assets/{}.png'.format('_'.join([str(x) for x in [self.name, 'alt' if self.alt else None, self.state] if x is not None]))
         if os.path.exists(path):
             self.image = pyglet.image.load(path)
 

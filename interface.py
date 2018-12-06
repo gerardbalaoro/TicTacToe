@@ -19,13 +19,13 @@ class Interface(pyglet.window.Window):
         
         # Game Image Assets
         self.images = {
-            'background': pyglet.image.load('images/background.png'),
-            'background_dark': pyglet.image.load('images/background_dark.png'),
-            'background_light': pyglet.image.load('images/background_light.png'),
-            'player_1': pyglet.image.load('images/player_1.png'),
-            'player_2': pyglet.image.load('images/player_2.png'),
-            'icon_32': pyglet.image.load('images/icon_32.png'),
-            'icon_16': pyglet.image.load('images/icon_16.png'),
+            'background': pyglet.image.load('assets/background.png'),
+            'background_dark': pyglet.image.load('assets/background_dark.png'),
+            'background_light': pyglet.image.load('assets/background_light.png'),
+            'player_1': pyglet.image.load('assets/player_1.png'),
+            'player_2': pyglet.image.load('assets/player_2.png'),
+            'icon_32': pyglet.image.load('assets/icon_32.png'),
+            'icon_16': pyglet.image.load('assets/icon_16.png'),
         }
 
         self.set_icon(self.images['icon_32'], self.images['icon_16'])
