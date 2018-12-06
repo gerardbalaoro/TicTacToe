@@ -61,7 +61,7 @@
 ## Credits
 
 - Interface design based on **["Tic Tac Toe"](https://www.deviantart.com/darksuck/art/Tic-Tac-Toe-PSD-612417028)** by **DarkSuck** on **DeviantArt**
-- "Tic Tac Toe" Icon made by **Freepik** from <www.flaticon.com>
-- "Info" and "Controls" Icon made by **Roundicons** from <www.flaticon.com>
-- "Click" Icon made by **Pixel perfect** <www.flaticon.com>
-- "Undo" Icon made by **Kiranshastry** from <www.flaticon.com>
+- "Tic Tac Toe" Icon made by **Freepik** from www.flaticon.com
+- "Info" and "Controls" Icon made by **Roundicons** from www.flaticon.com
+- "Click" Icon made by **Pixel perfect** www.flaticon.com
+- "Undo" Icon made by **Kiranshastry** from www.flaticon.com
