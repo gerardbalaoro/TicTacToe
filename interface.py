@@ -1,9 +1,14 @@
+"""Game Interface Module"""
+
 import pyglet
 from pyglet.gl import *
-from objects import *
-from game import *
+from sprites import *
+from engine import *
+from main import Game
 
 class Interface(pyglet.window.Window):
+    """Game Interface Class"""
+
     def __init__(self, game:Game):
         """Initialize Game Interface
         
@@ -197,9 +202,7 @@ class Interface(pyglet.window.Window):
                             if self.game.engine.set(self.game.player_tile, r, c):
                                 self.game.player_end_move()
                                 if self.game.engine.check_unflippable(r, c):
-                                    self.game.winner = self.game.player                       
-                            else:
-                                print('Game Error: Set Returned False')
+                                    self.game.winner = self.game.player
       
     def start_screen(self):    
         """Render Start Screen Elements"""

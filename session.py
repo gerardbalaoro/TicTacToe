@@ -1,6 +1,9 @@
+"""Session Handler Module"""
+
 import json, datetime, os
 
 class Session:
+    """Session Handler Class"""
 
     data = {}
     path = None
