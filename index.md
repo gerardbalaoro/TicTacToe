@@ -37,7 +37,7 @@
 3. Install the necessary requirements using **pip** by running the command below:
 
     ```
-    pip install requirments.txt
+    pip install -r requirments.txt
     ```
 
 4. Run the main game script.
